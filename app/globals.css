@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  --color-navy-950: #05080f;
+  --color-navy-900: #0b1220;
+  --color-navy-800: #121b2e;
+  --color-navy-700: #1b2740;
+  --color-navy-600: #2a3a5c;
+
+  --color-blue-500: #2f6fed;
+  --color-blue-400: #5b9dff;
+  --color-blue-300: #8fc0ff;
+
+  --color-ice-50: #f5f7fa;
+  --color-slate-400: #8b96a8;
+  --color-slate-500: #6b7690;
+
+  --color-green-500: #22c55e;
+  --color-red-500: #ef4444;
+  --color-amber-500: #f59e0b;
+}
+
+@theme inline {
+  --color-navy-950: var(--color-navy-950);
+  --color-navy-900: var(--color-navy-900);
+  --color-navy-800: var(--color-navy-800);
+  --color-navy-700: var(--color-navy-700);
+  --color-navy-600: var(--color-navy-600);
+  --color-blue-500: var(--color-blue-500);
+  --color-blue-400: var(--color-blue-400);
+  --color-blue-300: var(--color-blue-300);
+  --color-ice-50: var(--color-ice-50);
+  --color-slate-400: var(--color-slate-400);
+  --color-slate-500: var(--color-slate-500);
+  --color-green-500: var(--color-green-500);
+  --color-red-500: var(--color-red-500);
+  --color-amber-500: var(--color-amber-500);
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+body {
+  background: var(--color-navy-900);
+  color: var(--color-ice-50);
+  font-family: var(--font-sans), sans-serif;
+}
+
+/* Signature motif: diamond bullet, echoing the logo's node/diamond shape */
+.diamond-bullet {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--color-blue-400);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+/* Signature motif: connecting-nodes loader, four diamonds pulsing around a
+   center diamond - a direct nod to the Datacrux mark. */
+@keyframes node-pulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.85) rotate(45deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+.node-loader {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+.node-loader .node {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--color-blue-400);
+  transform: rotate(45deg);
+  animation: node-pulse 1.2s ease-in-out infinite;
+}
+.node-loader .node:nth-child(1) { top: 0; left: 50%; margin-left: -4px; animation-delay: 0s; }
+.node-loader .node:nth-child(2) { top: 50%; right: 0; margin-top: -4px; animation-delay: 0.15s; }
+.node-loader .node:nth-child(3) { bottom: 0; left: 50%; margin-left: -4px; animation-delay: 0.3s; }
+.node-loader .node:nth-child(4) { top: 50%; left: 0; margin-top: -4px; animation-delay: 0.45s; }
+.node-loader .node:nth-child(5) {
+  top: 50%; left: 50%; margin-top: -6px; margin-left: -6px;
+  width: 12px; height: 12px;
+  background: var(--color-blue-500);
+  animation-delay: 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .node-loader .node { animation: none; opacity: 0.8; }
+}
