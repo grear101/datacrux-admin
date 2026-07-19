@@ -154,7 +154,7 @@ export default function ProductsPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5">List price ($)</label>
+              <label className="block text-xs text-slate-400 mb-1.5">List price (₦)</label>
               <input
                 required
                 type="number"
@@ -165,7 +165,7 @@ export default function ProductsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5">Floor price ($)</label>
+              <label className="block text-xs text-slate-400 mb-1.5">Floor price (₦)</label>
               <input
                 required
                 type="number"
@@ -224,8 +224,10 @@ export default function ProductsPage() {
                 <p className="text-slate-400 text-sm mt-1 truncate">{p.description}</p>
               )}
               <p className="font-mono text-sm mt-2 text-slate-400">
-                ${Number(p.price).toFixed(2)}{" "}
-                <span className="text-slate-500">· floor ${Number(p.minPrice).toFixed(2)}</span>
+                ₦{Number(p.price).toLocaleString("en-NG", { minimumFractionDigits: 2 })}{" "}
+                <span className="text-slate-500">
+                  · floor ₦{Number(p.minPrice).toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                </span>
               </p>
             </div>
             <div className="flex gap-2 shrink-0">
