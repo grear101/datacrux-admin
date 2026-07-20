@@ -9,6 +9,7 @@ import { isLoggedIn, clearToken } from "@/lib/api";
 const NAV_ITEMS = [
   { href: "/products", label: "Products" },
   { href: "/ai-settings", label: "AMARA's Persona" },
+  { href: "/embed", label: "Add to Website" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

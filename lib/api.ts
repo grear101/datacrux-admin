@@ -116,3 +116,12 @@ export function getAiSettings() {
 export function updateAiSettings(data: AiSettings) {
   return request<AiSettings>("/clients/ai-settings", { method: "PATCH", body: JSON.stringify(data) });
 }
+
+// --- Integration / API key ---
+export function getApiKey() {
+  return request<{ apiKey: string }>("/clients/api-key");
+}
+
+export function regenerateApiKey() {
+  return request<{ apiKey: string }>("/clients/api-key/regenerate", { method: "POST" });
+}
