@@ -6,17 +6,34 @@
   <title>Widget Preview</title>
   <style>
     body { font-family: sans-serif; padding: 40px; background: #f5f5f5; }
+    code { background: #eee; padding: 2px 6px; border-radius: 4px; }
   </style>
 </head>
 <body>
   <h1>My Test Website</h1>
   <p>The AMARA chat bubble should appear bottom-right, WhatsApp-style.</p>
+  <p>
+    Visit this page as-is to test the normal click-to-open flow.<br />
+    Add <code>?product=YOUR_PRODUCT_ID</code> to the URL to test the
+    ad-landing flow, where the chat opens and greets automatically.
+  </p>
   <p>Try resizing your browser window narrow to see the mobile fullscreen behavior.</p>
 
-  <script src="./widget.js"
-          data-api-key="dcx_3694dee92800d97cbda8c28bb4eed3487d7568ade816cfdf"
-          data-api-url="https://datacrux-backend-production.up.railway.app"
-          data-business-name="Demo Business"
-          defer></script>
+  <script>
+    // Reads ?product=xxx from this preview page's own URL, purely so this
+    // one test page can demonstrate both flows - a real embed on a business's
+    // site would just hardcode data-product-id directly in the script tag.
+    var params = new URLSearchParams(window.location.search);
+    var productId = params.get("product");
+
+    var s = document.createElement("script");
+    s.src = "./widget.js";
+    s.setAttribute("data-api-key", "dcx_3694dee92800d97cbda8c28bb4eed3487d7568ade816cfdf");
+    s.setAttribute("data-api-url", "https://datacrux-backend-production.up.railway.app");
+    s.setAttribute("data-business-name", "Demo Business");
+    if (productId) s.setAttribute("data-product-id", productId);
+    s.defer = true;
+    document.body.appendChild(s);
+  </script>
 </body>
 </html>

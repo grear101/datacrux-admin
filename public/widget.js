@@ -153,6 +153,11 @@
     }
     .send-btn:disabled { opacity: 0.5; cursor: default; }
     .send-btn svg { width: 19px; height: 19px; }
+
+    .powered-by {
+      text-align: center; font-size: 10.5px; color: #667781;
+      padding: 5px 0; background: #F0F0F0; flex-shrink: 0;
+    }
   `;
   root.appendChild(style);
 
@@ -184,7 +189,8 @@
     '<button class="send-btn" aria-label="Send">' +
     '<svg viewBox="0 0 24 24" fill="white"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>' +
     "</button>" +
-    "</div>";
+    "</div>" +
+    '<div class="powered-by">Powered by Datacrux Africa Ltd</div>';
 
   root.appendChild(panel);
   root.appendChild(bubble);
@@ -197,11 +203,19 @@
 
   var conversationId = sessionStorage.getItem(storageKey) || null;
   var isFirstMessage = !conversationId;
+  var hasGreeted = messagesEl.children.length > 0;
 
   function openPanel() {
     panel.classList.add("open");
     bubble.classList.add("hidden");
     inputEl.focus();
+    // Fresh conversation, chat has never opened before - greet the customer
+    // automatically instead of leaving an empty chat waiting for them to
+    // speak first. This mirrors how a real WhatsApp business chat feels.
+    if (!conversationId && !hasGreeted) {
+      hasGreeted = true;
+      triggerGreeting();
+    }
   }
   function closePanel() {
     panel.classList.remove("open");
@@ -248,6 +262,33 @@
     messagesEl.appendChild(row);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return row;
+  }
+
+  async function triggerGreeting() {
+    var loadingRow = addLoading();
+    var body = { message: "Hi" };
+    if (productId) body.productId = productId;
+
+    try {
+      var res = await fetch(apiUrl + "/conversation/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+        body: JSON.stringify(body),
+      });
+      var data = await res.json();
+      loadingRow.remove();
+
+      if (!res.ok) {
+        return; // fail silently here - the customer can still just type and start normally
+      }
+
+      conversationId = data.conversationId;
+      sessionStorage.setItem(storageKey, conversationId);
+      isFirstMessage = false;
+      addMessage(data.reply, "amara");
+    } catch (err) {
+      loadingRow.remove();
+    }
   }
 
   async function sendMessage(text) {
