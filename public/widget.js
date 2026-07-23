@@ -158,6 +158,14 @@
       text-align: center; font-size: 10.5px; color: #667781;
       padding: 5px 0; background: #F0F0F0; flex-shrink: 0;
     }
+
+    .order-btn-row { display: flex; justify-content: flex-start; margin: 6px 0 10px; }
+    .order-btn {
+      background: #25D366; color: white; border: none; border-radius: 20px;
+      padding: 10px 18px; font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+      cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .order-btn:hover { background: #20bd5a; }
   `;
   root.appendChild(style);
 
@@ -264,6 +272,20 @@
     return row;
   }
 
+  function addOrderButton(link) {
+    var row = document.createElement("div");
+    row.className = "order-btn-row";
+    var btn = document.createElement("button");
+    btn.className = "order-btn";
+    btn.textContent = "SEND TO CONFIRM ORDER";
+    btn.addEventListener("click", function () {
+      window.open(link, "_blank");
+    });
+    row.appendChild(btn);
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
   async function triggerGreeting() {
     var loadingRow = addLoading();
     var body = { message: "Hi" };
@@ -318,6 +340,9 @@
       sessionStorage.setItem(storageKey, conversationId);
       isFirstMessage = false;
       addMessage(data.reply, "amara");
+      if (data.orderLink) {
+        addOrderButton(data.orderLink);
+      }
     } catch (err) {
       loadingRow.remove();
       addMessage("Sorry, I couldn't connect just now. Please try again.", "amara");

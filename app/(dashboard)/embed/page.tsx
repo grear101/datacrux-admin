@@ -1,7 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getApiKey, regenerateApiKey, getProducts, Product, ApiError } from "@/lib/api";
+import {
+  getApiKey,
+  regenerateApiKey,
+  getProducts,
+  Product,
+  getWhatsappNumber,
+  updateWhatsappNumber,
+  ApiError,
+} from "@/lib/api";
 import { NodeLoader } from "@/components/NodeLoader";
 
 export default function EmbedPage() {
@@ -13,6 +21,10 @@ export default function EmbedPage() {
   const [regenerating, setRegenerating] = useState(false);
   const [origin, setOrigin] = useState("");
 
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [whatsappSaved, setWhatsappSaved] = useState(false);
+  const [whatsappSaving, setWhatsappSaving] = useState(false);
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- reading window.location is client-only, must happen post-mount
     setOrigin(window.location.origin);
@@ -23,6 +35,11 @@ export default function EmbedPage() {
       .then(setProducts)
       .catch(() => {
         /* non-critical for this page - the snippet still works without a product picked */
+      });
+    getWhatsappNumber()
+      .then((r) => setWhatsappNumber(r.whatsappNumber || ""))
+      .catch(() => {
+        /* non-critical - field just starts empty */
       });
   }, []);
 
@@ -43,6 +60,23 @@ export default function EmbedPage() {
       setError(err instanceof ApiError ? err.message : "Couldn't regenerate your API key.");
     } finally {
       setRegenerating(false);
+    }
+  }
+
+  async function handleSaveWhatsapp(e: React.FormEvent) {
+    e.preventDefault();
+    setWhatsappSaving(true);
+    setError(null);
+    setWhatsappSaved(false);
+    try {
+      const r = await updateWhatsappNumber(whatsappNumber);
+      setWhatsappNumber(r.whatsappNumber || "");
+      setWhatsappSaved(true);
+      setTimeout(() => setWhatsappSaved(false), 2500);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Couldn't save your WhatsApp number.");
+    } finally {
+      setWhatsappSaving(false);
     }
   }
 
@@ -75,6 +109,34 @@ export default function EmbedPage() {
           {error}
         </p>
       )}
+
+      <form
+        onSubmit={handleSaveWhatsapp}
+        className="rounded-xl border border-navy-700 bg-navy-800 p-4 mb-8"
+      >
+        <p className="text-sm font-medium mb-1.5">Your WhatsApp number</p>
+        <p className="text-xs text-slate-500 mb-3">
+          When a customer confirms an order, AMARA sends them a button that opens WhatsApp with the
+          order details already filled in, addressed to this number. Include your country code (e.g.
+          2348012345678).
+        </p>
+        <div className="flex items-center gap-3">
+          <input
+            value={whatsappNumber}
+            onChange={(e) => setWhatsappNumber(e.target.value)}
+            placeholder="2348012345678"
+            className="flex-1 rounded-lg bg-navy-900 border border-navy-700 px-4 py-2.5 text-sm font-mono outline-none focus:border-blue-400"
+          />
+          <button
+            type="submit"
+            disabled={whatsappSaving}
+            className="rounded-lg bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white text-sm font-medium px-4 py-2.5 transition shrink-0"
+          >
+            {whatsappSaving ? "Saving…" : "Save"}
+          </button>
+        </div>
+        {whatsappSaved && <p className="text-sm text-green-500 mt-2">Saved</p>}
+      </form>
 
       {apiKey && (
         <>

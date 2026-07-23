@@ -125,3 +125,15 @@ export function getApiKey() {
 export function regenerateApiKey() {
   return request<{ apiKey: string }>("/clients/api-key/regenerate", { method: "POST" });
 }
+
+// --- WhatsApp number (for order notifications) ---
+export function getWhatsappNumber() {
+  return request<{ whatsappNumber: string | null }>("/clients/whatsapp-number");
+}
+
+export function updateWhatsappNumber(whatsappNumber: string) {
+  return request<{ whatsappNumber: string | null }>("/clients/whatsapp-number", {
+    method: "PATCH",
+    body: JSON.stringify({ whatsappNumber }),
+  });
+}
