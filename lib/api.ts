@@ -69,6 +69,8 @@ export interface Product {
   price: string;
   minPrice: string;
   available: boolean;
+  imageUrl: string | null;
+  isService: boolean;
   createdAt: string;
 }
 
@@ -82,6 +84,8 @@ export function createProduct(data: {
   category?: string;
   price: number;
   minPrice: number;
+  imageUrl?: string;
+  isService?: boolean;
 }) {
   return request<Product>("/products", { method: "POST", body: JSON.stringify(data) });
 }
@@ -93,12 +97,43 @@ export function updateProduct(id: string, data: Partial<{
   price: number;
   minPrice: number;
   available: boolean;
+  imageUrl: string;
+  isService: boolean;
 }>) {
   return request<Product>(`/products/${id}`, { method: "PATCH", body: JSON.stringify(data) });
 }
 
 export function deleteProduct(id: string) {
   return request<Product>(`/products/${id}`, { method: "DELETE" });
+}
+
+// Uploads an image file to this admin panel's own /api/upload-product-image
+// route (which itself verifies the login token against the backend before
+// accepting anything), and returns a real hosted URL to save on a product.
+export async function uploadProductImage(file: File): Promise<string> {
+  const token = getToken();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch("/api/upload-product-image", {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    body: formData,
+  });
+
+  if (!res.ok) {
+    let message = `Upload failed (${res.status})`;
+    try {
+      const body = await res.json();
+      message = body.error || message;
+    } catch {
+      // keep generic message
+    }
+    throw new ApiError(message, res.status);
+  }
+
+  const data = await res.json();
+  return data.url as string;
 }
 
 // --- AI Settings ---
@@ -126,7 +161,7 @@ export function regenerateApiKey() {
   return request<{ apiKey: string }>("/clients/api-key/regenerate", { method: "POST" });
 }
 
-// --- WhatsApp number (for order notifications) ---
+// --- WhatsApp number (for order and handover notifications) ---
 export function getWhatsappNumber() {
   return request<{ whatsappNumber: string | null }>("/clients/whatsapp-number");
 }

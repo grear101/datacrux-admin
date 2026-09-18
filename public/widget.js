@@ -58,7 +58,6 @@
     }
     .panel.open { display: flex; }
 
-    /* Mobile: fill the whole screen, like the WhatsApp app itself */
     @media (max-width: 480px) {
       .panel {
         bottom: 0; right: 0; left: 0; top: 0;
@@ -123,6 +122,9 @@
       display: block; font-size: 10.5px; color: rgba(0,0,0,0.45);
       text-align: right; margin-top: 2px; margin-left: 8px; float: right;
     }
+    .msg img.product-photo {
+      display: block; max-width: 100%; border-radius: 6px; margin-bottom: 4px;
+    }
 
     .msg-row.loading .msg {
       background: #FFFFFF; padding: 10px 14px;
@@ -159,13 +161,15 @@
       padding: 5px 0; background: #F0F0F0; flex-shrink: 0;
     }
 
-    .order-btn-row { display: flex; justify-content: flex-start; margin: 6px 0 10px; }
-    .order-btn {
+    .action-btn-row { display: flex; justify-content: flex-start; margin: 6px 0 10px; }
+    .action-btn {
       background: #25D366; color: white; border: none; border-radius: 20px;
       padding: 10px 18px; font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
       cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
-    .order-btn:hover { background: #20bd5a; }
+    .action-btn:hover { background: #20bd5a; }
+    .action-btn.handover { background: #128C7E; }
+    .action-btn.handover:hover { background: #0f7365; }
   `;
   root.appendChild(style);
 
@@ -217,9 +221,6 @@
     panel.classList.add("open");
     bubble.classList.add("hidden");
     inputEl.focus();
-    // Fresh conversation, chat has never opened before - greet the customer
-    // automatically instead of leaving an empty chat waiting for them to
-    // speak first. This mirrors how a real WhatsApp business chat feels.
     if (!conversationId && !hasGreeted) {
       hasGreeted = true;
       triggerGreeting();
@@ -262,6 +263,21 @@
     return row;
   }
 
+  function addImageMessage(url) {
+    var row = document.createElement("div");
+    row.className = "msg-row amara";
+    var bubbleEl = document.createElement("div");
+    bubbleEl.className = "msg amara";
+    var img = document.createElement("img");
+    img.className = "product-photo";
+    img.src = url;
+    img.alt = "";
+    bubbleEl.appendChild(img);
+    row.appendChild(bubbleEl);
+    messagesEl.appendChild(row);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
   function addLoading() {
     var row = document.createElement("div");
     row.className = "msg-row amara loading";
@@ -272,18 +288,30 @@
     return row;
   }
 
-  function addOrderButton(link) {
+  function addActionButton(label, link, variant) {
     var row = document.createElement("div");
-    row.className = "order-btn-row";
+    row.className = "action-btn-row";
     var btn = document.createElement("button");
-    btn.className = "order-btn";
-    btn.textContent = "SEND TO CONFIRM ORDER";
+    btn.className = "action-btn" + (variant ? " " + variant : "");
+    btn.textContent = label;
     btn.addEventListener("click", function () {
       window.open(link, "_blank");
     });
     row.appendChild(btn);
     messagesEl.appendChild(row);
     messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function handleResponseExtras(data) {
+    if (data.imageUrl) {
+      addImageMessage(data.imageUrl);
+    }
+    if (data.orderLink) {
+      addActionButton("SEND TO CONFIRM ORDER", data.orderLink);
+    }
+    if (data.handoverLink) {
+      addActionButton("CONNECT TO OUR TEAM", data.handoverLink, "handover");
+    }
   }
 
   async function triggerGreeting() {
@@ -301,13 +329,14 @@
       loadingRow.remove();
 
       if (!res.ok) {
-        return; // fail silently here - the customer can still just type and start normally
+        return;
       }
 
       conversationId = data.conversationId;
       sessionStorage.setItem(storageKey, conversationId);
       isFirstMessage = false;
       addMessage(data.reply, "amara");
+      handleResponseExtras(data);
     } catch (err) {
       loadingRow.remove();
     }
@@ -340,9 +369,7 @@
       sessionStorage.setItem(storageKey, conversationId);
       isFirstMessage = false;
       addMessage(data.reply, "amara");
-      if (data.orderLink) {
-        addOrderButton(data.orderLink);
-      }
+      handleResponseExtras(data);
     } catch (err) {
       loadingRow.remove();
       addMessage("Sorry, I couldn't connect just now. Please try again.", "amara");
@@ -365,9 +392,6 @@
     }
   });
 
-  // Ad-originated traffic: open immediately, no click needed - this mirrors
-  // how WhatsApp's own "click to chat" ad links land a customer straight
-  // into a conversation rather than a landing page they have to act on again.
   if (productId) {
     openPanel();
   }

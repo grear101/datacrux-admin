@@ -1,25 +1,36 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Product,
   getProducts,
   createProduct,
   updateProduct,
   deleteProduct,
+  uploadProductImage,
   ApiError,
 } from "@/lib/api";
 import { NodeLoader } from "@/components/NodeLoader";
 
 type FormState = {
-  name: string;
+  name: strAing;
   description: string;
   category: string;
   price: string;
   minPrice: string;
+  imageUrl: string;
+  isService: boolean;
 };
 
-const EMPTY_FORM: FormState = { name: "", description: "", category: "", price: "", minPrice: "" };
+const EMPTY_FORM: FormState = {
+  name: "",
+  description: "",
+  category: "",
+  price: "",
+  minPrice: "",
+  imageUrl: "",
+  isService: false,
+};
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[] | null>(null);
@@ -28,6 +39,8 @@ export default function ProductsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function load() {
     try {
@@ -58,9 +71,26 @@ export default function ProductsPage() {
       category: p.category || "",
       price: p.price,
       minPrice: p.minPrice,
+      imageUrl: p.imageUrl || "",
+      isService: p.isService,
     });
     setShowForm(true);
     setError(null);
+  }
+
+  async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const url = await uploadProductImage(file);
+      setForm((f) => ({ ...f, imageUrl: url }));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Couldn't upload that image.");
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -74,6 +104,8 @@ export default function ProductsPage() {
         category: form.category || undefined,
         price: Number(form.price),
         minPrice: Number(form.minPrice),
+        imageUrl: form.imageUrl || undefined,
+        isService: form.isService,
       };
       if (editingId) {
         await updateProduct(editingId, payload);
@@ -134,6 +166,39 @@ export default function ProductsPage() {
           </h2>
 
           <div>
+            <label className="block text-xs text-slate-400 mb-1.5">Photo</label>
+            <div className="flex items-center gap-4">
+              {form.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={form.imageUrl}
+                  alt=""
+                  className="w-16 h-16 rounded-lg object-cover border border-navy-700"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-lg border border-dashed border-navy-700 flex items-center justify-center text-slate-500 text-xs">
+                  None
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="text-sm text-blue-300 hover:text-blue-200 border border-navy-700 rounded-lg px-3 py-1.5 disabled:opacity-50 transition"
+              >
+                {uploading ? "Uploading…" : form.imageUrl ? "Change photo" : "Upload photo"}
+              </button>
+            </div>
+          </div>
+
+          <div>
             <label className="block text-xs text-slate-400 mb-1.5">Name</label>
             <input
               required
@@ -177,10 +242,20 @@ export default function ProductsPage() {
             </div>
           </div>
 
+          <label className="flex items-center gap-2.5 text-sm text-slate-300 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.isService}
+              onChange={(e) => setForm({ ...form, isService: e.target.checked })}
+              className="w-4 h-4 accent-blue-500"
+            />
+            This is a service (AMARA asks for a date/time instead of a delivery address)
+          </label>
+
           <div className="flex gap-3 pt-1">
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || uploading}
               className="rounded-lg bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition"
             >
               {saving ? "Saving…" : editingId ? "Save changes" : "Create product"}
@@ -210,25 +285,42 @@ export default function ProductsPage() {
             key={p.id}
             className="rounded-xl border border-navy-700 bg-navy-800 p-4 flex items-center justify-between gap-4"
           >
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="diamond-bullet" />
-                <p className="font-medium truncate">{p.name}</p>
-                {!p.available && (
-                  <span className="text-[11px] uppercase tracking-wide text-amber-500 border border-amber-500/30 bg-amber-500/10 rounded px-1.5 py-0.5">
-                    Hidden
-                  </span>
-                )}
-              </div>
-              {p.description && (
-                <p className="text-slate-400 text-sm mt-1 truncate">{p.description}</p>
+            <div className="flex items-center gap-3 min-w-0">
+              {p.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={p.imageUrl}
+                  alt=""
+                  className="w-12 h-12 rounded-lg object-cover border border-navy-700 shrink-0"
+                />
+              ) : (
+                <div className="w-12 h-12 rounded-lg border border-navy-700 shrink-0" />
               )}
-              <p className="font-mono text-sm mt-2 text-slate-400">
-                ₦{Number(p.price).toLocaleString("en-NG", { minimumFractionDigits: 2 })}{" "}
-                <span className="text-slate-500">
-                  · floor ₦{Number(p.minPrice).toLocaleString("en-NG", { minimumFractionDigits: 2 })}
-                </span>
-              </p>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="diamond-bullet" />
+                  <p className="font-medium truncate">{p.name}</p>
+                  {p.isService && (
+                    <span className="text-[11px] uppercase tracking-wide text-blue-300 border border-blue-500/30 bg-blue-500/10 rounded px-1.5 py-0.5">
+                      Service
+                    </span>
+                  )}
+                  {!p.available && (
+                    <span className="text-[11px] uppercase tracking-wide text-amber-500 border border-amber-500/30 bg-amber-500/10 rounded px-1.5 py-0.5">
+                      Hidden
+                    </span>
+                  )}
+                </div>
+                {p.description && (
+                  <p className="text-slate-400 text-sm mt-1 truncate">{p.description}</p>
+                )}
+                <p className="font-mono text-sm mt-2 text-slate-400">
+                  ₦{Number(p.price).toLocaleString("en-NG", { minimumFractionDigits: 2 })}{" "}
+                  <span className="text-slate-500">
+                    · floor ₦{Number(p.minPrice).toLocaleString("en-NG", { minimumFractionDigits: 2 })}
+                  </span>
+                </p>
+              </div>
             </div>
             <div className="flex gap-2 shrink-0">
               <button
