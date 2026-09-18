@@ -13,7 +13,7 @@ import {
 import { NodeLoader } from "@/components/NodeLoader";
 
 type FormState = {
-  name: strAing;
+  name: string;
   description: string;
   category: string;
   price: string;
