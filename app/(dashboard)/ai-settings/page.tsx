@@ -49,6 +49,7 @@ export default function AiSettingsPage() {
         <ul className="space-y-1.5 text-sm text-slate-400">
           <DiamondBullet>AMARA never states a price herself - every offer goes through your Negotiation Engine.</DiamondBullet>
           <DiamondBullet>She&apos;ll never go below a product&apos;s floor price, regardless of tone or instructions.</DiamondBullet>
+          <DiamondBullet>Delivery fee ranges are estimates only - she never quotes an exact delivery amount or bakes it into an order&apos;s price.</DiamondBullet>
         </ul>
       </div>
 
@@ -94,6 +95,21 @@ export default function AiSettingsPage() {
               placeholder="What you sell, who you serve, what makes you different"
               className="w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-sm outline-none focus:border-blue-400 resize-none"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm text-slate-400 mb-1.5">Delivery fee range</label>
+            <input
+              maxLength={60}
+              value={settings.deliveryFeeRange || ""}
+              onChange={(e) => setSettings({ ...settings, deliveryFeeRange: e.target.value })}
+              placeholder="e.g. ₦500 - ₦2,000"
+              className="w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-sm font-mono outline-none focus:border-blue-400"
+            />
+            <p className="text-xs text-slate-500 mt-1.5">
+              AMARA will mention this as a rough estimate and say your delivery team confirms the exact
+              fee on contact - she&apos;ll never quote a single fixed number.
+            </p>
           </div>
 
           <div>

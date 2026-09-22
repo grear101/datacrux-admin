@@ -142,6 +142,7 @@ export interface AiSettings {
   greeting?: string;
   businessDescription?: string;
   customInstructions?: string;
+  deliveryFeeRange?: string;
 }
 
 export function getAiSettings() {
