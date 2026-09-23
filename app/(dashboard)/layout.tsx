@@ -8,6 +8,7 @@ import { isLoggedIn, clearToken } from "@/lib/api";
 
 const NAV_ITEMS = [
   { href: "/products", label: "Products" },
+  { href: "/orders", label: "Orders" },
   { href: "/ai-settings", label: "AMARA's Persona" },
   { href: "/embed", label: "Add to Website" },
 ];

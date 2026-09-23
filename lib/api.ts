@@ -107,6 +107,36 @@ export function deleteProduct(id: string) {
   return request<Product>(`/products/${id}`, { method: "DELETE" });
 }
 
+// --- Orders ---
+export interface OrderItem {
+  id: string;
+  quantity: number;
+  listPrice: string;
+  negotiatedPrice: string;
+  product: {
+    id: string;
+    name: string;
+    isService: boolean;
+  };
+}
+
+export interface Order {
+  id: string;
+  customerName: string | null;
+  customerPhone: string | null;
+  deliveryAddress: string | null;
+  subtotal: string;
+  discountTotal: string;
+  finalAmount: string;
+  status: string;
+  createdAt: string;
+  items: OrderItem[];
+}
+
+export function getOrders() {
+  return request<Order[]>("/orders");
+}
+
 // Uploads an image file to this admin panel's own /api/upload-product-image
 // route (which itself verifies the login token against the backend before
 // accepting anything), and returns a real hosted URL to save on a product.
