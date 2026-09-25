@@ -133,8 +133,32 @@ export interface Order {
   items: OrderItem[];
 }
 
-export function getOrders() {
-  return request<Order[]>("/orders");
+export interface OrderDateFilter {
+  startDate?: string; // YYYY-MM-DD
+  endDate?: string;   // YYYY-MM-DD
+}
+
+export function getOrders(filter: OrderDateFilter = {}) {
+  const params = new URLSearchParams();
+  if (filter.startDate) params.set("startDate", filter.startDate);
+  if (filter.endDate) params.set("endDate", filter.endDate);
+  const query = params.toString();
+  return request<Order[]>(`/orders${query ? `?${query}` : ""}`);
+}
+
+// --- Handovers ---
+export interface HandoverRequest {
+  id: string;
+  conversationId: string | null;
+  summary: string;
+  customerName: string | null;
+  customerPhone: string | null;
+  status: string;
+  createdAt: string;
+}
+
+export function getHandovers() {
+  return request<HandoverRequest[]>("/handovers");
 }
 
 // Uploads an image file to this admin panel's own /api/upload-product-image

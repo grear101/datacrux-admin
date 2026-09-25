@@ -27,19 +27,59 @@ const STATUS_STYLES: Record<string, string> = {
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   useEffect(() => {
-    getOrders()
+    setOrders(null);
+    setError(null);
+    getOrders({ startDate: startDate || undefined, endDate: endDate || undefined })
       .then(setOrders)
       .catch((err) => setError(err instanceof ApiError ? err.message : "Couldn't load orders."));
-  }, []);
+  }, [startDate, endDate]);
+
+  const hasFilter = !!startDate || !!endDate;
 
   return (
     <div>
       <h1 className="font-display text-2xl font-semibold">Orders</h1>
-      <p className="text-slate-400 text-sm mt-1 mb-8">
+      <p className="text-slate-400 text-sm mt-1 mb-6">
         Every order AMARA has confirmed, most recent first.
       </p>
+
+      <div className="flex flex-wrap items-end gap-3 mb-6 rounded-xl border border-navy-700 bg-navy-800 p-4">
+        <div>
+          <label className="block text-xs text-slate-500 mb-1">From</label>
+          <input
+            type="date"
+            value={startDate}
+            max={endDate || undefined}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="bg-navy-900 border border-navy-700 rounded-lg px-3 py-2 text-sm text-ice-50 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-slate-500 mb-1">To</label>
+          <input
+            type="date"
+            value={endDate}
+            min={startDate || undefined}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="bg-navy-900 border border-navy-700 rounded-lg px-3 py-2 text-sm text-ice-50 focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        {hasFilter && (
+          <button
+            onClick={() => {
+              setStartDate("");
+              setEndDate("");
+            }}
+            className="text-sm text-slate-400 hover:text-ice-50 px-3 py-2"
+          >
+            Clear
+          </button>
+        )}
+      </div>
 
       {error && (
         <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-6">
@@ -52,7 +92,9 @@ export default function OrdersPage() {
       {orders?.length === 0 && (
         <div className="text-center py-16 border border-dashed border-navy-700 rounded-xl">
           <p className="text-slate-400 text-sm">
-            No orders yet. Once AMARA confirms a sale, it&apos;ll show up here.
+            {hasFilter
+              ? "No orders in that date range."
+              : "No orders yet. Once AMARA confirms a sale, it'll show up here."}
           </p>
         </div>
       )}
