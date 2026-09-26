@@ -161,6 +161,36 @@ export function getHandovers() {
   return request<HandoverRequest[]>("/handovers");
 }
 
+// --- Analytics ---
+export interface AnalyticsSummary {
+  periodDays: number;
+  revenue: {
+    total: number;
+    byDay: { date: string; revenue: number; orderCount: number }[];
+  };
+  orders: {
+    total: number;
+  };
+  conversations: {
+    total: number;
+  };
+  conversionRate: number;
+  negotiation: {
+    totalAttempts: number;
+    approvedCount: number;
+    approvalRate: number;
+    avgDiscountPercent: number;
+  };
+  handovers: {
+    total: number;
+    handoverRate: number;
+  };
+}
+
+export function getAnalyticsSummary(days: number = 30) {
+  return request<AnalyticsSummary>(`/analytics/summary?days=${days}`);
+}
+
 // Uploads an image file to this admin panel's own /api/upload-product-image
 // route (which itself verifies the login token against the backend before
 // accepting anything), and returns a real hosted URL to save on a product.
