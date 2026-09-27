@@ -1,0 +1,33 @@
+name: Build & Deploy (Admin)
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: 'https://datacrux-backend-production.up.railway.app'
+
+      # Only reached if the build above succeeded. VERCEL_DEPLOY_HOOK_URL
+      # is a URL Vercel generates for you (Project Settings -> Git ->
+      # Deploy Hooks) - posting to it triggers a real deployment, no CLI
+      # or extra tokens needed.
+      - name: Trigger Vercel deploy
+        if: success()
+        run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK_URL }}"
