@@ -19,6 +19,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const pathname = usePathname();
   const [checked, setChecked] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn()) {
@@ -26,8 +27,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       return;
     }
     if (getRole() === "superadmin") {
-      // A Datacrux team login has no products/orders of its own to see
-      // here - send them to their own console instead.
       router.replace("/platform/clients");
       return;
     }
@@ -43,8 +42,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!checked) return null;
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 shrink-0 bg-navy-950 border-r border-navy-700 flex flex-col">
+    <div className="flex min-h-screen relative">
+      {/* Backdrop behind the sidebar drawer - mobile only */}
+      {mobileOpen && (
+        <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
+      )}
+
+      <aside
+        className={`fixed md:static top-0 left-0 h-full z-50 w-64 shrink-0 bg-navy-950 border-r border-navy-700 flex flex-col transition-transform duration-200 ${
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0`}
+      >
         <div className="p-6 flex flex-col items-start gap-3 border-b border-navy-700">
           <Image src="/logo.png" alt="Datacrux Africa" width={44} height={44} className="rounded-full" />
           <div>
@@ -60,6 +68,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm transition ${
                   active
                     ? "bg-blue-500/15 text-blue-300 border border-blue-500/30"
@@ -86,9 +95,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-8 py-10">{children}</div>
-      </main>
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile top bar - hidden on desktop, where the sidebar is always visible */}
+        <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-navy-700 bg-navy-950 sticky top-0 z-30">
+          <div className="flex items-center gap-2">
+            <Image src="/logo.png" alt="Datacrux Africa" width={28} height={28} className="rounded-full" />
+            <p className="font-display font-semibold text-sm">Datacrux Africa</p>
+          </div>
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="p-2 -mr-2 text-slate-300"
+            aria-label="Open menu"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 6h18M3 12h18M3 18h18" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-3xl mx-auto px-4 md:px-8 py-6 md:py-10">{children}</div>
+        </main>
+      </div>
     </div>
   );
 }
