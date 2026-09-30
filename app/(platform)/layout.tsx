@@ -7,15 +7,11 @@ import Image from "next/image";
 import { isLoggedIn, getRole, clearToken } from "@/lib/api";
 
 const NAV_ITEMS = [
-  { href: "/products", label: "Products" },
-  { href: "/orders", label: "Orders" },
-  { href: "/handovers", label: "Handovers" },
-  { href: "/analytics", label: "Analytics" },
-  { href: "/ai-settings", label: "AMARA's Persona" },
-  { href: "/embed", label: "Add to Website" },
+  { href: "/platform/onboard", label: "Onboard Business" },
+  { href: "/platform/clients", label: "Clients" },
 ];
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function PlatformLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [checked, setChecked] = useState(false);
@@ -25,10 +21,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       router.replace("/login");
       return;
     }
-    if (getRole() === "superadmin") {
-      // A Datacrux team login has no products/orders of its own to see
-      // here - send them to their own console instead.
-      router.replace("/platform/clients");
+    if (getRole() !== "superadmin") {
+      // A regular business admin has no business being here - send them to
+      // their own dashboard instead of just showing a bare error page.
+      router.replace("/products");
       return;
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect -- standard auth-guard pattern, not a cascading-render issue
@@ -49,7 +45,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Image src="/logo.png" alt="Datacrux Africa" width={44} height={44} className="rounded-full" />
           <div>
             <p className="font-display font-semibold text-sm leading-tight">Datacrux Africa</p>
-            <p className="text-[11px] text-slate-500 tracking-wide">AMARA Admin</p>
+            <p className="text-[11px] text-slate-500 tracking-wide">Team Console</p>
           </div>
         </div>
 

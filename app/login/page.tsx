@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { login, setToken, ApiError } from "@/lib/api";
+import { login, setToken, setRole, ApiError } from "@/lib/api";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -19,7 +19,11 @@ export default function LoginPage() {
     try {
       const result = await login(email, password);
       setToken(result.accessToken);
-      router.push("/products");
+      setRole(result.admin.role);
+      // A Datacrux team login lands in the team console, not a business's
+      // own dashboard - their account has no products/orders of its own,
+      // so there's nothing useful for them at /products.
+      router.push(result.admin.role === "superadmin" ? "/platform/clients" : "/products");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Try again.");
     } finally {

@@ -17,8 +17,22 @@ export function setToken(token: string) {
   localStorage.setItem("datacrux_token", token);
 }
 
+// The role travels alongside the token, set once at login - this is what
+// lets the (platform) area tell a Datacrux team login apart from an
+// ordinary business admin, entirely on the client side, with no extra
+// network call needed.
+export function setRole(role: string) {
+  localStorage.setItem("datacrux_role", role);
+}
+
+export function getRole(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("datacrux_role");
+}
+
 export function clearToken() {
   localStorage.removeItem("datacrux_token");
+  localStorage.removeItem("datacrux_role");
 }
 
 export function isLoggedIn(): boolean {
@@ -255,5 +269,78 @@ export function updateWhatsappNumber(whatsappNumber: string) {
   return request<{ whatsappNumber: string | null }>("/clients/whatsapp-number", {
     method: "PATCH",
     body: JSON.stringify({ whatsappNumber }),
+  });
+}
+
+// --- Platform (Datacrux team / superadmin only) ---
+export interface PlatformClientSummary {
+  id: string;
+  name: string;
+  plan: string | null;
+  status: "active" | "trial" | "trial_expired" | "suspended";
+  subscription: string;
+  conversationLimit: number | null;
+  conversationsThisMonth: number;
+  conversationsAllTime: number;
+  tokensAllTime: number;
+  trialEndsAt: string | null;
+  setupFeePaid: boolean;
+  ownerEmails: string[];
+  createdAt: string;
+}
+
+export interface PlatformClientDetail extends PlatformClientSummary {
+  whatsappNumber: string | null;
+  admins: { id: string; email: string; role: string; lastLoginAt: string | null }[];
+}
+
+export function onboardClient(data: {
+  businessName: string;
+  ownerEmail: string;
+  ownerPassword: string;
+  whatsappNumber?: string;
+  plan: string;
+  conversationLimit?: number;
+  subscription: "trial" | "active";
+  trialDays?: number;
+  setupFeePaid?: boolean;
+}) {
+  return request<{
+    clientId: string;
+    businessName: string;
+    apiKey: string;
+    ownerEmail: string;
+    plan: string;
+    subscription: string;
+    trialEndsAt: string | null;
+  }>("/platform/clients", { method: "POST", body: JSON.stringify(data) });
+}
+
+export function listPlatformClients() {
+  return request<PlatformClientSummary[]>("/platform/clients");
+}
+
+export function getPlatformClientDetail(id: string) {
+  return request<PlatformClientDetail>(`/platform/clients/${id}`);
+}
+
+export function updatePlatformClient(
+  id: string,
+  data: Partial<{
+    plan: string;
+    conversationLimit: number;
+    unlimited: boolean;
+    subscription: "trial" | "active" | "suspended";
+    extendTrialDays: number;
+    setupFeePaid: boolean;
+  }>,
+) {
+  return request(`/platform/clients/${id}`, { method: "PATCH", body: JSON.stringify(data) });
+}
+
+export function resetAdminPassword(adminUserId: string, newPassword: string) {
+  return request<{ adminUserId: string; email: string }>("/platform/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ adminUserId, newPassword }),
   });
 }
