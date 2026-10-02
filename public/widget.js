@@ -148,6 +148,7 @@
       padding: 10px 16px; font-size: 14.5px; color: #111b21; outline: none;
     }
     .input-bar input::placeholder { color: #8696a0; }
+    .input-bar input:disabled { background: #e4e4e4; color: #8696a0; }
     .send-btn {
       width: 40px; height: 40px; border-radius: 50%; background: #00A884;
       border: none; color: white; display: flex; align-items: center; justify-content: center;
@@ -314,36 +315,78 @@
     }
   }
 
+  // Called the moment an order is confirmed (signaled by data.orderLink
+  // being present) - the backend has already closed this conversation on
+  // its side, so the widget disables further typing to match. Anyone
+  // still typing after this would just get the same closing message
+  // again from the backend anyway, at no AI cost - this just makes that
+  // visually clear instead of leaving the input looking usable.
+  function closeChatInput() {
+    inputEl.disabled = true;
+    inputEl.placeholder = "This chat has ended";
+    sendBtn.disabled = true;
+  }
+
+  // Clears a session that the backend has told us has expired, so the
+  // very next message starts a brand-new conversation automatically -
+  // the customer never sees an error for this, it's seamless on their end.
+  function resetStaleSession() {
+    conversationId = null;
+    isFirstMessage = true;
+    sessionStorage.removeItem(storageKey);
+  }
+
+  // One shared place for the actual network call, used by both the
+  // automatic greeting and every message the customer sends.
+  async function postToConversation(body) {
+    var res = await fetch(apiUrl + "/conversation/message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-api-key": apiKey },
+      body: JSON.stringify(body),
+    });
+    var data = await res.json().catch(function () { return {}; });
+    return { ok: res.ok, status: res.status, data: data };
+  }
+
   async function triggerGreeting() {
     var loadingRow = addLoading();
     var body = { message: "Hi" };
     if (productId) body.productId = productId;
 
     try {
-      var res = await fetch(apiUrl + "/conversation/message", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-api-key": apiKey },
-        body: JSON.stringify(body),
-      });
-      var data = await res.json();
+      var result = await postToConversation(body);
       loadingRow.remove();
 
-      if (!res.ok) {
+      if (!result.ok) {
+        if (result.status === 403 && result.data.code === "ACCOUNT_UNAVAILABLE") {
+          addMessage(result.data.message, "amara");
+          closeChatInput();
+        }
+        // Any other failure on the very first greeting just stays
+        // silent, same as before - there's nothing to retry yet since
+        // no conversation existed.
         return;
       }
 
-      conversationId = data.conversationId;
+      conversationId = result.data.conversationId;
       sessionStorage.setItem(storageKey, conversationId);
       isFirstMessage = false;
-      addMessage(data.reply, "amara");
-      handleResponseExtras(data);
+      addMessage(result.data.reply, "amara");
+      handleResponseExtras(result.data);
+      if (result.data.orderLink) {
+        closeChatInput();
+      }
     } catch (err) {
       loadingRow.remove();
     }
   }
 
-  async function sendMessage(text) {
-    addMessage(text, "user");
+  async function sendMessage(text, isRetry) {
+    // On a silent retry (stale session), the user's message bubble is
+    // already on screen from the first attempt - don't add it twice.
+    if (!isRetry) {
+      addMessage(text, "user");
+    }
     var loadingRow = addLoading();
     sendBtn.disabled = true;
 
@@ -352,24 +395,35 @@
     if (isFirstMessage && productId) body.productId = productId;
 
     try {
-      var res = await fetch(apiUrl + "/conversation/message", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-api-key": apiKey },
-        body: JSON.stringify(body),
-      });
-      var data = await res.json();
+      var result = await postToConversation(body);
       loadingRow.remove();
 
-      if (!res.ok) {
+      if (!result.ok) {
+        if (result.status === 403 && result.data.code === "ACCOUNT_UNAVAILABLE") {
+          addMessage(result.data.message, "amara");
+          closeChatInput();
+          return;
+        }
+        if (result.status === 410 && result.data.code === "CONVERSATION_EXPIRED" && !isRetry) {
+          // Seamless to the customer: drop the stale session and send
+          // this exact message again as a brand-new conversation.
+          resetStaleSession();
+          sendBtn.disabled = false;
+          await sendMessage(text, true);
+          return;
+        }
         addMessage("Sorry, something went wrong. Please try again in a moment.", "amara");
         return;
       }
 
-      conversationId = data.conversationId;
+      conversationId = result.data.conversationId;
       sessionStorage.setItem(storageKey, conversationId);
       isFirstMessage = false;
-      addMessage(data.reply, "amara");
-      handleResponseExtras(data);
+      addMessage(result.data.reply, "amara");
+      handleResponseExtras(result.data);
+      if (result.data.orderLink) {
+        closeChatInput();
+      }
     } catch (err) {
       loadingRow.remove();
       addMessage("Sorry, I couldn't connect just now. Please try again.", "amara");
@@ -382,7 +436,7 @@
     var text = inputEl.value.trim();
     if (!text) return;
     inputEl.value = "";
-    sendMessage(text);
+    sendMessage(text, false);
   });
 
   inputEl.addEventListener("keydown", function (e) {
