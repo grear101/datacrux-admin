@@ -175,7 +175,7 @@ export function getHandovers() {
   return request<HandoverRequest[]>("/handovers");
 }
 
-// --- Analytics ---
+// --- Analytics (tenant-scoped, a business's own admin panel) ---
 export interface AnalyticsSummary {
   periodDays: number;
   revenue: {
@@ -343,4 +343,31 @@ export function resetAdminPassword(adminUserId: string, newPassword: string) {
     method: "POST",
     body: JSON.stringify({ adminUserId, newPassword }),
   });
+}
+
+// --- Platform overview (cross-business owner dashboard) ---
+export interface PlatformOverview {
+  periodDays: number;
+  businesses: { active: number; trial: number; trialExpired: number; suspended: number; total: number };
+  revenue: { total: number; previousPeriodTotal: number; percentChange: number | null };
+  orders: { total: number };
+  conversations: { total: number };
+  uniqueCustomers: number;
+  tokensUsed: number;
+  conversionRate: number;
+  negotiation: {
+    totalAttempts: number;
+    approvedCount: number;
+    approvalRate: number;
+    avgDiscountPercent: number;
+  };
+  handovers: { total: number; handoverRate: number };
+  highlights: {
+    businessesNearLimit: { id: string; name: string; usedThisMonth: number; limit: number }[];
+    trialsEndingSoon: { id: string; name: string; trialEndsAt: string; daysLeft: number }[];
+  };
+}
+
+export function getPlatformOverview(days: number = 30) {
+  return request<PlatformOverview>(`/platform/overview?days=${days}`);
 }

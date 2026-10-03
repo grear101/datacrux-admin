@@ -20,10 +20,10 @@ export default function LoginPage() {
       const result = await login(email, password);
       setToken(result.accessToken);
       setRole(result.admin.role);
-      // A Datacrux team login lands in the team console, not a business's
-      // own dashboard - their account has no products/orders of its own,
-      // so there's nothing useful for them at /products.
-      router.push(result.admin.role === "superadmin" ? "/platform/clients" : "/products");
+      // A Datacrux team login lands in the team console's overview
+      // dashboard - their account has no products/orders of its own, so
+      // there's nothing useful for them at /products.
+      router.push(result.admin.role === "superadmin" ? "/platform/overview" : "/products");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Try again.");
     } finally {
