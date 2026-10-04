@@ -7,6 +7,7 @@ import Image from "next/image";
 import { isLoggedIn, getRole, clearToken } from "@/lib/api";
 
 const NAV_ITEMS = [
+  { href: "/platform/overview", label: "Overview" },
   { href: "/platform/onboard", label: "Onboard Business" },
   { href: "/platform/clients", label: "Clients" },
 ];
