@@ -3,7 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Product,
+  ProductUsage,
   getProducts,
+  getProductUsage,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -15,6 +17,7 @@ import { NodeLoader } from "@/components/NodeLoader";
 type FormState = {
   name: string;
   description: string;
+  specifications: string;
   category: string;
   price: string;
   minPrice: string;
@@ -25,6 +28,7 @@ type FormState = {
 const EMPTY_FORM: FormState = {
   name: "",
   description: "",
+  specifications: "",
   category: "",
   price: "",
   minPrice: "",
@@ -34,6 +38,7 @@ const EMPTY_FORM: FormState = {
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[] | null>(null);
+  const [usage, setUsage] = useState<ProductUsage | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -44,8 +49,9 @@ export default function ProductsPage() {
 
   async function load() {
     try {
-      const data = await getProducts();
-      setProducts(data);
+      const [productsData, usageData] = await Promise.all([getProducts(), getProductUsage()]);
+      setProducts(productsData);
+      setUsage(usageData);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Couldn't load products.");
     }
@@ -55,6 +61,8 @@ export default function ProductsPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- standard fetch-on-mount pattern
     load();
   }, []);
+
+  const atLimit = usage?.limit != null && usage.count >= usage.limit;
 
   function startCreate() {
     setEditingId(null);
@@ -68,6 +76,7 @@ export default function ProductsPage() {
     setForm({
       name: p.name,
       description: p.description || "",
+      specifications: p.specifications || "",
       category: p.category || "",
       price: p.price,
       minPrice: p.minPrice,
@@ -101,6 +110,7 @@ export default function ProductsPage() {
       const payload = {
         name: form.name,
         description: form.description || undefined,
+        specifications: form.specifications || undefined,
         category: form.category || undefined,
         price: Number(form.price),
         minPrice: Number(form.minPrice),
@@ -135,7 +145,7 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between mb-3">
         <div>
           <h1 className="font-display text-2xl font-semibold">Products</h1>
           <p className="text-slate-400 text-sm mt-1">
@@ -144,11 +154,19 @@ export default function ProductsPage() {
         </div>
         <button
           onClick={startCreate}
-          className="rounded-lg bg-blue-500 hover:bg-blue-400 text-white text-sm font-medium px-4 py-2 transition shrink-0"
+          disabled={!!atLimit}
+          className="rounded-lg bg-blue-500 hover:bg-blue-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 transition shrink-0"
         >
           Add product
         </button>
       </div>
+
+      {usage && (
+        <p className={`text-xs mb-6 ${atLimit ? "text-amber-500" : "text-slate-500"}`}>
+          {usage.count} / {usage.limit ?? "∞"} products used
+          {atLimit && " — you've reached your plan's limit. Remove a product, or ask Datacrux to raise it."}
+        </p>
+      )}
 
       {error && (
         <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-6">
@@ -214,6 +232,20 @@ export default function ProductsPage() {
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               className="w-full rounded-lg bg-navy-900 border border-navy-700 px-3 py-2 text-sm outline-none focus:border-blue-400"
+              placeholder="A short, customer-facing description"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-slate-400 mb-1.5">
+              Specifications <span className="text-slate-500">(sizes, colors, material, coverage per unit — AMARA uses this to answer detailed questions and do quantity calculations)</span>
+            </label>
+            <textarea
+              value={form.specifications}
+              onChange={(e) => setForm({ ...form, specifications: e.target.value })}
+              rows={3}
+              className="w-full rounded-lg bg-navy-900 border border-navy-700 px-3 py-2 text-sm outline-none focus:border-blue-400"
+              placeholder={"e.g.\nSizes: S, M, L, XL\nColors: Black, White, Navy\nMaterial: 100% cotton\n1 roll covers 2 square meters"}
             />
           </div>
 

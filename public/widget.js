@@ -89,9 +89,9 @@
       margin-left: auto; background: none; border: none; color: white; opacity: 0.9;
       cursor: pointer; padding: 4px; display: flex; align-items: center;
     }
-    @media (max-width: 480px) {
-      .header .close { display: none; }
-    }
+    /* Close stays visible on every screen size, including mobile - the
+       back arrow next to it does the same thing, but a close button
+       should always be unmistakably there too. */
 
     .messages {
       flex: 1; overflow-y: auto; padding: 14px 10px;
@@ -317,10 +317,7 @@
 
   // Called the moment an order is confirmed (signaled by data.orderLink
   // being present) - the backend has already closed this conversation on
-  // its side, so the widget disables further typing to match. Anyone
-  // still typing after this would just get the same closing message
-  // again from the backend anyway, at no AI cost - this just makes that
-  // visually clear instead of leaving the input looking usable.
+  // its side, so the widget disables further typing to match.
   function closeChatInput() {
     inputEl.disabled = true;
     inputEl.placeholder = "This chat has ended";
@@ -362,9 +359,6 @@
           addMessage(result.data.message, "amara");
           closeChatInput();
         }
-        // Any other failure on the very first greeting just stays
-        // silent, same as before - there's nothing to retry yet since
-        // no conversation existed.
         return;
       }
 
@@ -405,8 +399,6 @@
           return;
         }
         if (result.status === 410 && result.data.code === "CONVERSATION_EXPIRED" && !isRetry) {
-          // Seamless to the customer: drop the stale session and send
-          // this exact message again as a brand-new conversation.
           resetStaleSession();
           sendBtn.disabled = false;
           await sendMessage(text, true);

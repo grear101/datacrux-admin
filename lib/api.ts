@@ -17,10 +17,6 @@ export function setToken(token: string) {
   localStorage.setItem("datacrux_token", token);
 }
 
-// The role travels alongside the token, set once at login - this is what
-// lets the (platform) area tell a Datacrux team login apart from an
-// ordinary business admin, entirely on the client side, with no extra
-// network call needed.
 export function setRole(role: string) {
   localStorage.setItem("datacrux_role", role);
 }
@@ -79,6 +75,7 @@ export interface Product {
   id: string;
   name: string;
   description: string | null;
+  specifications: string | null;
   category: string | null;
   price: string;
   minPrice: string;
@@ -88,13 +85,23 @@ export interface Product {
   createdAt: string;
 }
 
+export interface ProductUsage {
+  count: number;
+  limit: number | null;
+}
+
 export function getProducts() {
   return request<Product[]>("/products");
+}
+
+export function getProductUsage() {
+  return request<ProductUsage>("/products/usage");
 }
 
 export function createProduct(data: {
   name: string;
   description?: string;
+  specifications?: string;
   category?: string;
   price: number;
   minPrice: number;
@@ -107,6 +114,7 @@ export function createProduct(data: {
 export function updateProduct(id: string, data: Partial<{
   name: string;
   description: string;
+  specifications: string;
   category: string;
   price: number;
   minPrice: number;
@@ -283,6 +291,8 @@ export interface PlatformClientSummary {
   conversationsThisMonth: number;
   conversationsAllTime: number;
   tokensAllTime: number;
+  productLimit: number | null;
+  productsUsed: number;
   trialEndsAt: string | null;
   setupFeePaid: boolean;
   ownerEmails: string[];
@@ -301,6 +311,7 @@ export function onboardClient(data: {
   whatsappNumber?: string;
   plan: string;
   conversationLimit?: number;
+  productLimit?: number;
   subscription: "trial" | "active";
   trialDays?: number;
   setupFeePaid?: boolean;
@@ -313,6 +324,7 @@ export function onboardClient(data: {
     plan: string;
     subscription: string;
     trialEndsAt: string | null;
+    productLimit: number | null;
   }>("/platform/clients", { method: "POST", body: JSON.stringify(data) });
 }
 
@@ -330,6 +342,8 @@ export function updatePlatformClient(
     plan: string;
     conversationLimit: number;
     unlimited: boolean;
+    productLimit: number;
+    productsUnlimited: boolean;
     subscription: "trial" | "active" | "suspended";
     extendTrialDays: number;
     setupFeePaid: boolean;

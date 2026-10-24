@@ -8,6 +8,14 @@ const inputClass =
   "w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-ice-50 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 transition";
 const labelClass = "block text-sm text-slate-400 mb-1.5";
 
+// Matches PlatformService's own defaults - shown here just so your team
+// sees what will be applied if the product limit field is left blank.
+const DEFAULT_PRODUCT_LIMIT_HINT: Record<string, string> = {
+  standard: "defaults to 20 if left blank",
+  premium: "defaults to 50 if left blank",
+  enterprise: "defaults to unlimited if left blank",
+};
+
 type Result = {
   clientId: string;
   businessName: string;
@@ -16,6 +24,7 @@ type Result = {
   plan: string;
   subscription: string;
   trialEndsAt: string | null;
+  productLimit: number | null;
 };
 
 export default function OnboardPage() {
@@ -25,6 +34,7 @@ export default function OnboardPage() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [plan, setPlan] = useState("standard");
   const [conversationLimit, setConversationLimit] = useState(""); // blank = unlimited
+  const [productLimit, setProductLimit] = useState(""); // blank = use the plan's default
   const [subscription, setSubscription] = useState<"trial" | "active">("trial");
   const [trialDays, setTrialDays] = useState("7");
   const [setupFeePaid, setSetupFeePaid] = useState(false);
@@ -40,6 +50,7 @@ export default function OnboardPage() {
     setWhatsappNumber("");
     setPlan("standard");
     setConversationLimit("");
+    setProductLimit("");
     setSubscription("trial");
     setTrialDays("7");
     setSetupFeePaid(false);
@@ -59,6 +70,7 @@ export default function OnboardPage() {
         whatsappNumber: whatsappNumber || undefined,
         plan,
         conversationLimit: conversationLimit ? Number(conversationLimit) : undefined,
+        productLimit: productLimit ? Number(productLimit) : undefined,
         subscription,
         trialDays: subscription === "trial" ? Number(trialDays) || 7 : undefined,
         setupFeePaid,
@@ -80,6 +92,7 @@ export default function OnboardPage() {
           <p className="text-sm text-slate-400 mb-4">
             Owner login: {result.ownerEmail} · Plan: {result.plan} · Status: {result.subscription}
             {result.trialEndsAt && ` (trial ends ${new Date(result.trialEndsAt).toLocaleDateString()})`}
+            {" · "}Product limit: {result.productLimit ?? "Unlimited"}
           </p>
           <p className="text-xs text-slate-500 mb-1">API key (for the widget - the business can also find this on their own Add to Website page):</p>
           <p className="font-mono text-sm bg-navy-900 rounded-lg px-3 py-2 break-all">{result.apiKey}</p>
@@ -131,15 +144,16 @@ export default function OnboardPage() {
           <input id="whatsappNumber" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} className={inputClass} placeholder="e.g. 2348012345678" />
         </div>
 
+        <div>
+          <label className={labelClass} htmlFor="plan">Plan</label>
+          <select id="plan" value={plan} onChange={(e) => setPlan(e.target.value)} className={inputClass}>
+            <option value="standard">Standard</option>
+            <option value="premium">Premium</option>
+            <option value="enterprise">Enterprise</option>
+          </select>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className={labelClass} htmlFor="plan">Plan</label>
-            <select id="plan" value={plan} onChange={(e) => setPlan(e.target.value)} className={inputClass}>
-              <option value="standard">Standard</option>
-              <option value="premium">Premium</option>
-              <option value="enterprise">Enterprise</option>
-            </select>
-          </div>
           <div>
             <label className={labelClass} htmlFor="conversationLimit">Conversations / month</label>
             <input
@@ -150,6 +164,18 @@ export default function OnboardPage() {
               onChange={(e) => setConversationLimit(e.target.value)}
               className={inputClass}
               placeholder="Leave blank for unlimited"
+            />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="productLimit">Product limit</label>
+            <input
+              id="productLimit"
+              type="number"
+              min={0}
+              value={productLimit}
+              onChange={(e) => setProductLimit(e.target.value)}
+              className={inputClass}
+              placeholder={DEFAULT_PRODUCT_LIMIT_HINT[plan]}
             />
           </div>
         </div>

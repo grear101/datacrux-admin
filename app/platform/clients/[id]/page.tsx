@@ -42,6 +42,8 @@ export default function ClientDetailPage() {
   const [plan, setPlan] = useState("standard");
   const [unlimited, setUnlimited] = useState(false);
   const [conversationLimit, setConversationLimit] = useState("");
+  const [productsUnlimited, setProductsUnlimited] = useState(false);
+  const [productLimit, setProductLimit] = useState("");
   const [subscription, setSubscription] = useState("trial");
   const [setupFeePaid, setSetupFeePaid] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -63,6 +65,8 @@ export default function ClientDetailPage() {
         setPlan(data.plan || "standard");
         setUnlimited(data.conversationLimit == null);
         setConversationLimit(data.conversationLimit != null ? String(data.conversationLimit) : "");
+        setProductsUnlimited(data.productLimit == null);
+        setProductLimit(data.productLimit != null ? String(data.productLimit) : "");
         setSubscription(data.subscription);
         setSetupFeePaid(data.setupFeePaid);
       })
@@ -85,6 +89,7 @@ export default function ClientDetailPage() {
         subscription: subscription as "trial" | "active" | "suspended",
         setupFeePaid,
         ...(unlimited ? { unlimited: true } : { conversationLimit: Number(conversationLimit) || 0 }),
+        ...(productsUnlimited ? { productsUnlimited: true } : { productLimit: Number(productLimit) || 0 }),
       });
       setSaveMessage("Saved.");
       loadClient();
@@ -147,10 +152,14 @@ export default function ClientDetailPage() {
       </p>
 
       <Section title="Usage">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
-            <p className="text-xs text-slate-500 mb-1">This month</p>
+            <p className="text-xs text-slate-500 mb-1">Conversations this month</p>
             <p className="font-mono text-lg">{client.conversationsThisMonth} / {client.conversationLimit ?? "∞"}</p>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 mb-1">Products</p>
+            <p className="font-mono text-lg">{client.productsUsed} / {client.productLimit ?? "∞"}</p>
           </div>
           <div>
             <p className="text-xs text-slate-500 mb-1">All-time conversations</p>
@@ -219,6 +228,25 @@ export default function ClientDetailPage() {
               />
               <label className="flex items-center gap-2 text-sm text-slate-400 whitespace-nowrap">
                 <input type="checkbox" checked={unlimited} onChange={(e) => setUnlimited(e.target.checked)} />
+                Unlimited
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className={labelClass} htmlFor="productLimit">Product limit</label>
+            <div className="flex items-center gap-3">
+              <input
+                id="productLimit"
+                type="number"
+                min={0}
+                disabled={productsUnlimited}
+                value={productLimit}
+                onChange={(e) => setProductLimit(e.target.value)}
+                className={`${inputClass} disabled:opacity-50`}
+              />
+              <label className="flex items-center gap-2 text-sm text-slate-400 whitespace-nowrap">
+                <input type="checkbox" checked={productsUnlimited} onChange={(e) => setProductsUnlimited(e.target.checked)} />
                 Unlimited
               </label>
             </div>
