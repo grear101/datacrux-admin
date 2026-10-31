@@ -5,11 +5,9 @@ import Link from "next/link";
 import { onboardClient, ApiError } from "@/lib/api";
 
 const inputClass =
-  "w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-ice-50 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 transition";
-const labelClass = "block text-sm text-slate-400 mb-1.5";
+  "w-full rounded-lg bg-surface-50 border border-card-border px-4 py-2.5 text-ink-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition";
+const labelClass = "block text-sm text-ink-500 mb-1.5";
 
-// Matches PlatformService's own defaults - shown here just so your team
-// sees what will be applied if the product limit field is left blank.
 const DEFAULT_PRODUCT_LIMIT_HINT: Record<string, string> = {
   standard: "defaults to 20 if left blank",
   premium: "defaults to 50 if left blank",
@@ -33,8 +31,8 @@ export default function OnboardPage() {
   const [ownerPassword, setOwnerPassword] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [plan, setPlan] = useState("standard");
-  const [conversationLimit, setConversationLimit] = useState(""); // blank = unlimited
-  const [productLimit, setProductLimit] = useState(""); // blank = use the plan's default
+  const [conversationLimit, setConversationLimit] = useState("");
+  const [productLimit, setProductLimit] = useState("");
   const [subscription, setSubscription] = useState<"trial" | "active">("trial");
   const [trialDays, setTrialDays] = useState("7");
   const [setupFeePaid, setSetupFeePaid] = useState(false);
@@ -86,16 +84,16 @@ export default function OnboardPage() {
   if (result) {
     return (
       <div>
-        <h1 className="font-display text-2xl font-semibold mb-6">Business created</h1>
-        <div className="rounded-xl border border-green-500/30 bg-green-500/10 p-5 mb-6">
-          <p className="font-medium mb-1">{result.businessName}</p>
-          <p className="text-sm text-slate-400 mb-4">
+        <h1 className="font-display text-2xl font-semibold text-ink-900 mb-6">Business created</h1>
+        <div className="rounded-xl border border-green-200 bg-green-50 p-5 mb-6">
+          <p className="font-medium text-ink-900 mb-1">{result.businessName}</p>
+          <p className="text-sm text-ink-500 mb-4">
             Owner login: {result.ownerEmail} · Plan: {result.plan} · Status: {result.subscription}
             {result.trialEndsAt && ` (trial ends ${new Date(result.trialEndsAt).toLocaleDateString()})`}
             {" · "}Product limit: {result.productLimit ?? "Unlimited"}
           </p>
-          <p className="text-xs text-slate-500 mb-1">API key (for the widget - the business can also find this on their own Add to Website page):</p>
-          <p className="font-mono text-sm bg-navy-900 rounded-lg px-3 py-2 break-all">{result.apiKey}</p>
+          <p className="text-xs text-ink-400 mb-1">API key (for the widget - the business can also find this on their own Add to Website page):</p>
+          <p className="font-mono text-sm bg-card border border-card-border rounded-lg px-3 py-2 break-all text-ink-900">{result.apiKey}</p>
         </div>
         <div className="flex gap-3">
           <button
@@ -106,7 +104,7 @@ export default function OnboardPage() {
           </button>
           <Link
             href="/platform/clients"
-            className="rounded-lg border border-navy-700 hover:bg-navy-800 text-ice-50 font-medium px-4 py-2.5 transition"
+            className="rounded-lg border border-card-border hover:bg-surface-50 text-ink-900 font-medium px-4 py-2.5 transition"
           >
             View all clients
           </Link>
@@ -117,8 +115,8 @@ export default function OnboardPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold">Onboard a Business</h1>
-      <p className="text-slate-400 text-sm mt-1 mb-6">
+      <h1 className="font-display text-2xl font-semibold text-ink-900">Onboard a Business</h1>
+      <p className="text-ink-500 text-sm mt-1 mb-6">
         Creates their AMARA account, owner login, and API key in one step.
       </p>
 
@@ -180,13 +178,13 @@ export default function OnboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-navy-700 bg-navy-800 p-4 space-y-4">
+        <div className="rounded-xl border border-card-border bg-card shadow-sm p-4 space-y-4">
           <div className="flex gap-4">
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm text-ink-900">
               <input type="radio" name="subscription" checked={subscription === "trial"} onChange={() => setSubscription("trial")} />
               Trial
             </label>
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm text-ink-900">
               <input type="radio" name="subscription" checked={subscription === "active"} onChange={() => setSubscription("active")} />
               Paid (active now)
             </label>
@@ -198,7 +196,7 @@ export default function OnboardPage() {
               <input id="trialDays" type="number" min={1} value={trialDays} onChange={(e) => setTrialDays(e.target.value)} className={inputClass} />
             </div>
           ) : (
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm text-ink-900">
               <input type="checkbox" checked={setupFeePaid} onChange={(e) => setSetupFeePaid(e.target.checked)} />
               One-time setup fee has been paid
             </label>
@@ -206,7 +204,7 @@ export default function OnboardPage() {
         </div>
 
         {error && (
-          <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
+          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
         )}
 
         <button

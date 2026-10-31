@@ -147,8 +147,8 @@ export default function ProductsPage() {
     <div>
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h1 className="font-display text-2xl font-semibold">Products</h1>
-          <p className="text-slate-400 text-sm mt-1">
+          <h1 className="font-display text-2xl font-semibold text-ink-900">Products</h1>
+          <p className="text-ink-500 text-sm mt-1">
             What AMARA can sell, and the floor she&apos;ll never negotiate below.
           </p>
         </div>
@@ -162,14 +162,14 @@ export default function ProductsPage() {
       </div>
 
       {usage && (
-        <p className={`text-xs mb-6 ${atLimit ? "text-amber-500" : "text-slate-500"}`}>
+        <p className={`text-xs mb-6 ${atLimit ? "text-amber-600" : "text-ink-400"}`}>
           {usage.count} / {usage.limit ?? "∞"} products used
           {atLimit && " — you've reached your plan's limit. Remove a product, or ask Datacrux to raise it."}
         </p>
       )}
 
       {error && (
-        <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-6">
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-6">
           {error}
         </p>
       )}
@@ -177,24 +177,24 @@ export default function ProductsPage() {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="mb-8 rounded-xl border border-navy-700 bg-navy-800 p-5 space-y-4"
+          className="mb-8 rounded-xl border border-card-border bg-card shadow-sm p-5 space-y-4"
         >
-          <h2 className="font-display font-medium text-sm text-blue-300">
+          <h2 className="font-display font-medium text-sm text-blue-600">
             {editingId ? "Edit product" : "New product"}
           </h2>
 
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Photo</label>
+            <label className="block text-xs text-ink-500 mb-1.5">Photo</label>
             <div className="flex items-center gap-4">
               {form.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={form.imageUrl}
                   alt=""
-                  className="w-16 h-16 rounded-lg object-cover border border-navy-700"
+                  className="w-16 h-16 rounded-lg object-cover border border-card-border"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-lg border border-dashed border-navy-700 flex items-center justify-center text-slate-500 text-xs">
+                <div className="w-16 h-16 rounded-lg border border-dashed border-card-border flex items-center justify-center text-ink-400 text-xs">
                   None
                 </div>
               )}
@@ -209,7 +209,7 @@ export default function ProductsPage() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="text-sm text-blue-300 hover:text-blue-200 border border-navy-700 rounded-lg px-3 py-1.5 disabled:opacity-50 transition"
+                className="text-sm text-blue-600 hover:text-blue-700 border border-card-border rounded-lg px-3 py-1.5 disabled:opacity-50 transition"
               >
                 {uploading ? "Uploading…" : form.imageUrl ? "Change photo" : "Upload photo"}
               </button>
@@ -217,64 +217,64 @@ export default function ProductsPage() {
           </div>
 
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Name</label>
+            <label className="block text-xs text-ink-500 mb-1.5">Name</label>
             <input
               required
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full rounded-lg bg-navy-900 border border-navy-700 px-3 py-2 text-sm outline-none focus:border-blue-400"
+              className="w-full rounded-lg bg-surface-50 border border-card-border px-3 py-2 text-sm text-ink-900 outline-none focus:border-blue-400"
             />
           </div>
 
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">Description</label>
+            <label className="block text-xs text-ink-500 mb-1.5">Description</label>
             <input
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full rounded-lg bg-navy-900 border border-navy-700 px-3 py-2 text-sm outline-none focus:border-blue-400"
+              className="w-full rounded-lg bg-surface-50 border border-card-border px-3 py-2 text-sm text-ink-900 outline-none focus:border-blue-400"
               placeholder="A short, customer-facing description"
             />
           </div>
 
           <div>
-            <label className="block text-xs text-slate-400 mb-1.5">
-              Specifications <span className="text-slate-500">(sizes, colors, material, coverage per unit — AMARA uses this to answer detailed questions and do quantity calculations)</span>
+            <label className="block text-xs text-ink-500 mb-1.5">
+              Specifications <span className="text-ink-400">(sizes, colors, material, coverage per unit — AMARA uses this to answer detailed questions and do quantity calculations)</span>
             </label>
             <textarea
               value={form.specifications}
               onChange={(e) => setForm({ ...form, specifications: e.target.value })}
               rows={3}
-              className="w-full rounded-lg bg-navy-900 border border-navy-700 px-3 py-2 text-sm outline-none focus:border-blue-400"
+              className="w-full rounded-lg bg-surface-50 border border-card-border px-3 py-2 text-sm text-ink-900 outline-none focus:border-blue-400"
               placeholder={"e.g.\nSizes: S, M, L, XL\nColors: Black, White, Navy\nMaterial: 100% cotton\n1 roll covers 2 square meters"}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5">List price (₦)</label>
+              <label className="block text-xs text-ink-500 mb-1.5">List price (₦)</label>
               <input
                 required
                 type="number"
                 step="0.01"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
-                className="w-full rounded-lg bg-navy-900 border border-navy-700 px-3 py-2 text-sm font-mono outline-none focus:border-blue-400"
+                className="w-full rounded-lg bg-surface-50 border border-card-border px-3 py-2 text-sm font-mono text-ink-900 outline-none focus:border-blue-400"
               />
             </div>
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5">Floor price (₦)</label>
+              <label className="block text-xs text-ink-500 mb-1.5">Floor price (₦)</label>
               <input
                 required
                 type="number"
                 step="0.01"
                 value={form.minPrice}
                 onChange={(e) => setForm({ ...form, minPrice: e.target.value })}
-                className="w-full rounded-lg bg-navy-900 border border-navy-700 px-3 py-2 text-sm font-mono outline-none focus:border-blue-400"
+                className="w-full rounded-lg bg-surface-50 border border-card-border px-3 py-2 text-sm font-mono text-ink-900 outline-none focus:border-blue-400"
               />
             </div>
           </div>
 
-          <label className="flex items-center gap-2.5 text-sm text-slate-300 cursor-pointer">
+          <label className="flex items-center gap-2.5 text-sm text-ink-500 cursor-pointer">
             <input
               type="checkbox"
               checked={form.isService}
@@ -295,7 +295,7 @@ export default function ProductsPage() {
             <button
               type="button"
               onClick={() => setShowForm(false)}
-              className="rounded-lg text-sm text-slate-400 hover:text-ice-50 px-4 py-2 transition"
+              className="rounded-lg text-sm text-ink-500 hover:text-ink-900 px-4 py-2 transition"
             >
               Cancel
             </button>
@@ -306,8 +306,8 @@ export default function ProductsPage() {
       {products === null && <NodeLoader label="Loading products…" />}
 
       {products?.length === 0 && (
-        <div className="text-center py-16 border border-dashed border-navy-700 rounded-xl">
-          <p className="text-slate-400 text-sm">No products yet. Add your first one above.</p>
+        <div className="text-center py-16 border border-dashed border-card-border rounded-xl">
+          <p className="text-ink-500 text-sm">No products yet. Add your first one above.</p>
         </div>
       )}
 
@@ -315,7 +315,7 @@ export default function ProductsPage() {
         {products?.map((p) => (
           <div
             key={p.id}
-            className="rounded-xl border border-navy-700 bg-navy-800 p-4 flex items-center justify-between gap-4"
+            className="rounded-xl border border-card-border bg-card shadow-sm p-4 flex items-center justify-between gap-4"
           >
             <div className="flex items-center gap-3 min-w-0">
               {p.imageUrl ? (
@@ -323,32 +323,32 @@ export default function ProductsPage() {
                 <img
                   src={p.imageUrl}
                   alt=""
-                  className="w-12 h-12 rounded-lg object-cover border border-navy-700 shrink-0"
+                  className="w-12 h-12 rounded-lg object-cover border border-card-border shrink-0"
                 />
               ) : (
-                <div className="w-12 h-12 rounded-lg border border-navy-700 shrink-0" />
+                <div className="w-12 h-12 rounded-lg border border-card-border shrink-0" />
               )}
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="diamond-bullet" />
-                  <p className="font-medium truncate">{p.name}</p>
+                  <p className="font-medium text-ink-900 truncate">{p.name}</p>
                   {p.isService && (
-                    <span className="text-[11px] uppercase tracking-wide text-blue-300 border border-blue-500/30 bg-blue-500/10 rounded px-1.5 py-0.5">
+                    <span className="text-[11px] uppercase tracking-wide text-blue-600 border border-blue-200 bg-blue-50 rounded px-1.5 py-0.5">
                       Service
                     </span>
                   )}
                   {!p.available && (
-                    <span className="text-[11px] uppercase tracking-wide text-amber-500 border border-amber-500/30 bg-amber-500/10 rounded px-1.5 py-0.5">
+                    <span className="text-[11px] uppercase tracking-wide text-amber-600 border border-amber-200 bg-amber-50 rounded px-1.5 py-0.5">
                       Hidden
                     </span>
                   )}
                 </div>
                 {p.description && (
-                  <p className="text-slate-400 text-sm mt-1 truncate">{p.description}</p>
+                  <p className="text-ink-500 text-sm mt-1 truncate">{p.description}</p>
                 )}
-                <p className="font-mono text-sm mt-2 text-slate-400">
+                <p className="font-mono text-sm mt-2 text-ink-500">
                   ₦{Number(p.price).toLocaleString("en-NG", { minimumFractionDigits: 2 })}{" "}
-                  <span className="text-slate-500">
+                  <span className="text-ink-400">
                     · floor ₦{Number(p.minPrice).toLocaleString("en-NG", { minimumFractionDigits: 2 })}
                   </span>
                 </p>
@@ -357,13 +357,13 @@ export default function ProductsPage() {
             <div className="flex gap-2 shrink-0">
               <button
                 onClick={() => startEdit(p)}
-                className="text-sm text-blue-300 hover:text-blue-200 px-3 py-1.5 rounded-lg hover:bg-navy-700 transition"
+                className="text-sm text-blue-600 hover:text-blue-700 px-3 py-1.5 rounded-lg hover:bg-surface-50 transition"
               >
                 Edit
               </button>
               <button
                 onClick={() => handleDelete(p.id)}
-                className="text-sm text-red-500/80 hover:text-red-500 px-3 py-1.5 rounded-lg hover:bg-navy-700 transition"
+                className="text-sm text-red-600/80 hover:text-red-600 px-3 py-1.5 rounded-lg hover:bg-surface-50 transition"
               >
                 Remove
               </button>

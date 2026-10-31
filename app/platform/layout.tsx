@@ -40,7 +40,6 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
 
   return (
     <div className="flex min-h-screen relative">
-      {/* Backdrop behind the sidebar drawer - mobile only */}
       {mobileOpen && (
         <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setMobileOpen(false)} />
       )}
@@ -93,11 +92,10 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile top bar - hidden on desktop, where the sidebar is always visible */}
         <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-navy-700 bg-navy-950 sticky top-0 z-30">
           <div className="flex items-center gap-2">
             <Image src="/logo.png" alt="Datacrux Africa" width={28} height={28} className="rounded-full" />
-            <p className="font-display font-semibold text-sm">Datacrux Africa</p>
+            <p className="font-display font-semibold text-sm text-ice-50">Datacrux Africa</p>
           </div>
           <button
             onClick={() => setMobileOpen(true)}
@@ -110,7 +108,9 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
           </button>
         </div>
 
-        <main className="flex-1 overflow-y-auto">
+        {/* The only real change for the light theme: this is now a pale
+            surface instead of dark navy. The sidebar above is untouched. */}
+        <main className="flex-1 overflow-y-auto bg-surface-50">
           <div className="max-w-3xl mx-auto px-4 md:px-8 py-6 md:py-10">{children}</div>
         </main>
       </div>

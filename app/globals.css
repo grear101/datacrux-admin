@@ -38,6 +38,13 @@
   --font-display: var(--font-space-grotesk);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains-mono);
+  --color-surface-50: #eef2fb;
+  --color-surface-100: #e4eaf7;
+  --color-card: #ffffff;
+  --color-card-border: #e2e8f4;
+  --color-ink-900: #0b1220;
+  --color-ink-500: #5b6472;
+  --color-ink-400: #7b8494;
 }
 
 body {

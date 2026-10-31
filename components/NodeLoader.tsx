@@ -8,7 +8,7 @@ export function NodeLoader({ label }: { label?: string }) {
         <span className="node" />
         <span className="node" />
       </div>
-      {label && <p className="text-sm text-slate-400">{label}</p>}
+      {label && <p className="text-sm text-ink-500">{label}</p>}
     </div>
   );
 }

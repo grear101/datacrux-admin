@@ -39,14 +39,14 @@ export default function AiSettingsPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold">AMARA&apos;s Persona</h1>
-      <p className="text-slate-400 text-sm mt-1 mb-8">
+      <h1 className="font-display text-2xl font-semibold text-ink-900">AMARA&apos;s Persona</h1>
+      <p className="text-ink-500 text-sm mt-1 mb-8">
         Shape how AMARA sounds. Some things never change, no matter what you set here.
       </p>
 
-      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 mb-8">
-        <p className="text-sm font-medium text-blue-300 mb-2">Always true, by design</p>
-        <ul className="space-y-1.5 text-sm text-slate-400">
+      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 mb-8">
+        <p className="text-sm font-medium text-blue-700 mb-2">Always true, by design</p>
+        <ul className="space-y-1.5 text-sm text-ink-500">
           <DiamondBullet>AMARA never states a price herself - every offer goes through your Negotiation Engine.</DiamondBullet>
           <DiamondBullet>She&apos;ll never go below a product&apos;s floor price, regardless of tone or instructions.</DiamondBullet>
           <DiamondBullet>Delivery fee ranges are estimates only - she never quotes an exact delivery amount or bakes it into an order&apos;s price.</DiamondBullet>
@@ -54,7 +54,7 @@ export default function AiSettingsPage() {
       </div>
 
       {error && (
-        <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-6">
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-6">
           {error}
         </p>
       )}
@@ -62,65 +62,65 @@ export default function AiSettingsPage() {
       {settings && (
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-sm text-slate-400 mb-1.5">Tone of voice</label>
+            <label className="block text-sm text-ink-500 mb-1.5">Tone of voice</label>
             <input
               maxLength={40}
               value={settings.tone || ""}
               onChange={(e) => setSettings({ ...settings, tone: e.target.value })}
               placeholder="e.g. upbeat and playful"
-              className="w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-sm outline-none focus:border-blue-400"
+              className="w-full rounded-lg bg-surface-50 border border-card-border px-4 py-2.5 text-sm text-ink-900 outline-none focus:border-blue-400"
             />
-            <p className="text-xs text-slate-500 mt-1">{(settings.tone || "").length}/40</p>
+            <p className="text-xs text-ink-400 mt-1">{(settings.tone || "").length}/40</p>
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1.5">Greeting</label>
+            <label className="block text-sm text-ink-500 mb-1.5">Greeting</label>
             <textarea
               maxLength={300}
               rows={2}
               value={settings.greeting || ""}
               onChange={(e) => setSettings({ ...settings, greeting: e.target.value })}
               placeholder="e.g. Hey there! Welcome to Demo Business!"
-              className="w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-sm outline-none focus:border-blue-400 resize-none"
+              className="w-full rounded-lg bg-surface-50 border border-card-border px-4 py-2.5 text-sm text-ink-900 outline-none focus:border-blue-400 resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1.5">About your business</label>
+            <label className="block text-sm text-ink-500 mb-1.5">About your business</label>
             <textarea
               maxLength={500}
               rows={3}
               value={settings.businessDescription || ""}
               onChange={(e) => setSettings({ ...settings, businessDescription: e.target.value })}
               placeholder="What you sell, who you serve, what makes you different"
-              className="w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-sm outline-none focus:border-blue-400 resize-none"
+              className="w-full rounded-lg bg-surface-50 border border-card-border px-4 py-2.5 text-sm text-ink-900 outline-none focus:border-blue-400 resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1.5">Delivery fee range</label>
+            <label className="block text-sm text-ink-500 mb-1.5">Delivery fee range</label>
             <input
               maxLength={60}
               value={settings.deliveryFeeRange || ""}
               onChange={(e) => setSettings({ ...settings, deliveryFeeRange: e.target.value })}
               placeholder="e.g. ₦500 - ₦2,000"
-              className="w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-sm font-mono outline-none focus:border-blue-400"
+              className="w-full rounded-lg bg-surface-50 border border-card-border px-4 py-2.5 text-sm font-mono text-ink-900 outline-none focus:border-blue-400"
             />
-            <p className="text-xs text-slate-500 mt-1.5">
+            <p className="text-xs text-ink-400 mt-1.5">
               AMARA will mention this as a rough estimate and say your delivery team confirms the exact
               fee on contact - she&apos;ll never quote a single fixed number.
             </p>
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1.5">Custom instructions</label>
+            <label className="block text-sm text-ink-500 mb-1.5">Custom instructions</label>
             <textarea
               maxLength={500}
               rows={3}
               value={settings.customInstructions || ""}
               onChange={(e) => setSettings({ ...settings, customInstructions: e.target.value })}
               placeholder="e.g. Always mention we offer free shipping over ₦50,000"
-              className="w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-sm outline-none focus:border-blue-400 resize-none"
+              className="w-full rounded-lg bg-surface-50 border border-card-border px-4 py-2.5 text-sm text-ink-900 outline-none focus:border-blue-400 resize-none"
             />
           </div>
 
@@ -132,7 +132,7 @@ export default function AiSettingsPage() {
             >
               {saving ? "Saving…" : "Save changes"}
             </button>
-            {saved && <span className="text-sm text-green-500">Saved</span>}
+            {saved && <span className="text-sm text-green-600">Saved</span>}
           </div>
         </form>
       )}

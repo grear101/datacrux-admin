@@ -19,9 +19,9 @@ function formatDate(iso: string) {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  confirmed: "text-green-500 border-green-500/30 bg-green-500/10",
-  pending: "text-amber-500 border-amber-500/30 bg-amber-500/10",
-  cancelled: "text-red-500 border-red-500/30 bg-red-500/10",
+  confirmed: "text-green-700 border-green-200 bg-green-50",
+  pending: "text-amber-700 border-amber-200 bg-amber-50",
+  cancelled: "text-red-700 border-red-200 bg-red-50",
 };
 
 export default function OrdersPage() {
@@ -42,30 +42,30 @@ export default function OrdersPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold">Orders</h1>
-      <p className="text-slate-400 text-sm mt-1 mb-6">
+      <h1 className="font-display text-2xl font-semibold text-ink-900">Orders</h1>
+      <p className="text-ink-500 text-sm mt-1 mb-6">
         Every order AMARA has confirmed, most recent first.
       </p>
 
-      <div className="flex flex-wrap items-end gap-3 mb-6 rounded-xl border border-navy-700 bg-navy-800 p-4">
+      <div className="flex flex-wrap items-end gap-3 mb-6 rounded-xl border border-card-border bg-card shadow-sm p-4">
         <div>
-          <label className="block text-xs text-slate-500 mb-1">From</label>
+          <label className="block text-xs text-ink-400 mb-1">From</label>
           <input
             type="date"
             value={startDate}
             max={endDate || undefined}
             onChange={(e) => setStartDate(e.target.value)}
-            className="bg-navy-900 border border-navy-700 rounded-lg px-3 py-2 text-sm text-ice-50 focus:outline-none focus:border-blue-500"
+            className="bg-surface-50 border border-card-border rounded-lg px-3 py-2 text-sm text-ink-900 focus:outline-none focus:border-blue-400"
           />
         </div>
         <div>
-          <label className="block text-xs text-slate-500 mb-1">To</label>
+          <label className="block text-xs text-ink-400 mb-1">To</label>
           <input
             type="date"
             value={endDate}
             min={startDate || undefined}
             onChange={(e) => setEndDate(e.target.value)}
-            className="bg-navy-900 border border-navy-700 rounded-lg px-3 py-2 text-sm text-ice-50 focus:outline-none focus:border-blue-500"
+            className="bg-surface-50 border border-card-border rounded-lg px-3 py-2 text-sm text-ink-900 focus:outline-none focus:border-blue-400"
           />
         </div>
         {hasFilter && (
@@ -74,7 +74,7 @@ export default function OrdersPage() {
               setStartDate("");
               setEndDate("");
             }}
-            className="text-sm text-slate-400 hover:text-ice-50 px-3 py-2"
+            className="text-sm text-ink-500 hover:text-ink-900 px-3 py-2"
           >
             Clear
           </button>
@@ -82,7 +82,7 @@ export default function OrdersPage() {
       </div>
 
       {error && (
-        <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-6">
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-6">
           {error}
         </p>
       )}
@@ -90,8 +90,8 @@ export default function OrdersPage() {
       {orders === null && !error && <NodeLoader label="Loading orders…" />}
 
       {orders?.length === 0 && (
-        <div className="text-center py-16 border border-dashed border-navy-700 rounded-xl">
-          <p className="text-slate-400 text-sm">
+        <div className="text-center py-16 border border-dashed border-card-border rounded-xl">
+          <p className="text-ink-500 text-sm">
             {hasFilter
               ? "No orders in that date range."
               : "No orders yet. Once AMARA confirms a sale, it'll show up here."}
@@ -101,16 +101,16 @@ export default function OrdersPage() {
 
       <div className="space-y-3">
         {orders?.map((order) => {
-          const statusStyle = STATUS_STYLES[order.status] || "text-slate-400 border-navy-700 bg-navy-700/30";
+          const statusStyle = STATUS_STYLES[order.status] || "text-ink-500 border-card-border bg-surface-50";
           const hasService = order.items.some((i) => i.product.isService);
 
           return (
-            <div key={order.id} className="rounded-xl border border-navy-700 bg-navy-800 p-4">
+            <div key={order.id} className="rounded-xl border border-card-border bg-card shadow-sm p-4">
               <div className="flex items-start justify-between gap-4 mb-3">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="diamond-bullet" />
-                    <p className="font-medium">{order.customerName || "Unknown customer"}</p>
+                    <p className="font-medium text-ink-900">{order.customerName || "Unknown customer"}</p>
                     <span
                       className={`text-[11px] uppercase tracking-wide border rounded px-1.5 py-0.5 ${statusStyle}`}
                     >
@@ -118,38 +118,38 @@ export default function OrdersPage() {
                     </span>
                   </div>
                   {order.customerPhone && (
-                    <p className="text-slate-400 text-sm font-mono mt-1">{order.customerPhone}</p>
+                    <p className="text-ink-500 text-sm font-mono mt-1">{order.customerPhone}</p>
                   )}
                 </div>
-                <p className="text-slate-500 text-xs shrink-0">{formatDate(order.createdAt)}</p>
+                <p className="text-ink-400 text-xs shrink-0">{formatDate(order.createdAt)}</p>
               </div>
 
               <div className="space-y-1 mb-3">
                 {order.items.map((item) => (
-                  <p key={item.id} className="text-sm text-slate-300 font-mono">
+                  <p key={item.id} className="text-sm text-ink-500 font-mono">
                     {item.quantity}x {item.product.name} @ {formatNaira(item.negotiatedPrice)}
                     {Number(item.negotiatedPrice) < Number(item.listPrice) && (
-                      <span className="text-slate-500"> (list {formatNaira(item.listPrice)})</span>
+                      <span className="text-ink-400"> (list {formatNaira(item.listPrice)})</span>
                     )}
                   </p>
                 ))}
               </div>
 
               {order.deliveryAddress && (
-                <p className="text-sm text-slate-400 mb-3">
-                  <span className="text-slate-500">{hasService ? "When/where: " : "Deliver to: "}</span>
+                <p className="text-sm text-ink-500 mb-3">
+                  <span className="text-ink-400">{hasService ? "When/where: " : "Deliver to: "}</span>
                   {order.deliveryAddress}
                 </p>
               )}
 
-              <div className="flex items-center justify-between pt-3 border-t border-navy-700">
-                <div className="text-xs text-slate-500">
+              <div className="flex items-center justify-between pt-3 border-t border-card-border">
+                <div className="text-xs text-ink-400">
                   Subtotal {formatNaira(order.subtotal)}
                   {Number(order.discountTotal) > 0 && (
                     <span> · Discount {formatNaira(order.discountTotal)}</span>
                   )}
                 </div>
-                <p className="font-mono font-medium">{formatNaira(order.finalAmount)}</p>
+                <p className="font-mono font-medium text-ink-900">{formatNaira(order.finalAmount)}</p>
               </div>
             </div>
           );

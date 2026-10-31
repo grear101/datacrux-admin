@@ -12,20 +12,20 @@ import {
 import { NodeLoader } from "@/components/NodeLoader";
 
 const inputClass =
-  "w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-ice-50 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 transition";
-const labelClass = "block text-sm text-slate-400 mb-1.5";
+  "w-full rounded-lg bg-surface-50 border border-card-border px-4 py-2.5 text-ink-900 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 transition";
+const labelClass = "block text-sm text-ink-500 mb-1.5";
 
 const STATUS_STYLES: Record<string, string> = {
-  active: "text-green-500 border-green-500/30 bg-green-500/10",
-  trial: "text-blue-400 border-blue-500/30 bg-blue-500/10",
-  trial_expired: "text-amber-500 border-amber-500/30 bg-amber-500/10",
-  suspended: "text-red-500 border-red-500/30 bg-red-500/10",
+  active: "text-green-700 border-green-200 bg-green-50",
+  trial: "text-blue-700 border-blue-200 bg-blue-50",
+  trial_expired: "text-amber-700 border-amber-200 bg-amber-50",
+  suspended: "text-red-700 border-red-200 bg-red-50",
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-800 p-5 mb-6">
-      <h2 className="font-display text-sm font-semibold text-slate-300 mb-4">{title}</h2>
+    <div className="rounded-xl border border-card-border bg-card shadow-sm p-5 mb-6">
+      <h2 className="font-display text-sm font-semibold text-ink-500 mb-4">{title}</h2>
       {children}
     </div>
   );
@@ -38,7 +38,6 @@ export default function ClientDetailPage() {
   const [client, setClient] = useState<PlatformClientDetail | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
 
-  // Editable fields, populated once the client loads.
   const [plan, setPlan] = useState("standard");
   const [unlimited, setUnlimited] = useState(false);
   const [conversationLimit, setConversationLimit] = useState("");
@@ -130,23 +129,23 @@ export default function ClientDetailPage() {
   }
 
   if (loadError) {
-    return <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{loadError}</p>;
+    return <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{loadError}</p>;
   }
   if (!client) {
     return <NodeLoader label="Loading business…" />;
   }
 
-  const statusStyle = STATUS_STYLES[client.status] || "text-slate-400 border-navy-700 bg-navy-700/30";
+  const statusStyle = STATUS_STYLES[client.status] || "text-ink-500 border-card-border bg-surface-50";
 
   return (
     <div>
       <div className="flex items-center gap-2 mb-1">
-        <h1 className="font-display text-2xl font-semibold">{client.name}</h1>
+        <h1 className="font-display text-2xl font-semibold text-ink-900">{client.name}</h1>
         <span className={`text-[11px] uppercase tracking-wide border rounded px-1.5 py-0.5 ${statusStyle}`}>
           {client.status.replace("_", " ")}
         </span>
       </div>
-      <p className="text-slate-400 text-sm mb-6">
+      <p className="text-ink-500 text-sm mb-6">
         Created {new Date(client.createdAt).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}
         {client.whatsappNumber && ` · WhatsApp: ${client.whatsappNumber}`}
       </p>
@@ -154,25 +153,25 @@ export default function ClientDetailPage() {
       <Section title="Usage">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
-            <p className="text-xs text-slate-500 mb-1">Conversations this month</p>
-            <p className="font-mono text-lg">{client.conversationsThisMonth} / {client.conversationLimit ?? "∞"}</p>
+            <p className="text-xs text-ink-400 mb-1">Conversations this month</p>
+            <p className="font-mono text-lg text-ink-900">{client.conversationsThisMonth} / {client.conversationLimit ?? "∞"}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500 mb-1">Products</p>
-            <p className="font-mono text-lg">{client.productsUsed} / {client.productLimit ?? "∞"}</p>
+            <p className="text-xs text-ink-400 mb-1">Products</p>
+            <p className="font-mono text-lg text-ink-900">{client.productsUsed} / {client.productLimit ?? "∞"}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500 mb-1">All-time conversations</p>
-            <p className="font-mono text-lg">{client.conversationsAllTime}</p>
+            <p className="text-xs text-ink-400 mb-1">All-time conversations</p>
+            <p className="font-mono text-lg text-ink-900">{client.conversationsAllTime}</p>
           </div>
           <div>
-            <p className="text-xs text-slate-500 mb-1">All-time AI tokens</p>
-            <p className="font-mono text-lg">{client.tokensAllTime.toLocaleString()}</p>
+            <p className="text-xs text-ink-400 mb-1">All-time AI tokens</p>
+            <p className="font-mono text-lg text-ink-900">{client.tokensAllTime.toLocaleString()}</p>
           </div>
         </div>
         {client.trialEndsAt && (
-          <div className="mt-4 pt-4 border-t border-navy-700 flex items-center gap-3">
-            <p className="text-sm text-slate-400">
+          <div className="mt-4 pt-4 border-t border-card-border flex items-center gap-3">
+            <p className="text-sm text-ink-500">
               Trial ends {new Date(client.trialEndsAt).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}
             </p>
             <input
@@ -180,12 +179,12 @@ export default function ClientDetailPage() {
               min={1}
               value={extendDays}
               onChange={(e) => setExtendDays(e.target.value)}
-              className="w-20 rounded-lg bg-navy-900 border border-navy-700 px-2 py-1 text-sm text-ice-50"
+              className="w-20 rounded-lg bg-surface-50 border border-card-border px-2 py-1 text-sm text-ink-900"
             />
             <button
               onClick={handleExtendTrial}
               disabled={extending}
-              className="text-sm rounded-lg border border-navy-700 hover:bg-navy-900 px-3 py-1 transition disabled:opacity-60"
+              className="text-sm rounded-lg border border-card-border hover:bg-surface-50 px-3 py-1 transition disabled:opacity-60 text-ink-900"
             >
               {extending ? "Extending…" : "+ Extend trial (days)"}
             </button>
@@ -226,7 +225,7 @@ export default function ClientDetailPage() {
                 onChange={(e) => setConversationLimit(e.target.value)}
                 className={`${inputClass} disabled:opacity-50`}
               />
-              <label className="flex items-center gap-2 text-sm text-slate-400 whitespace-nowrap">
+              <label className="flex items-center gap-2 text-sm text-ink-500 whitespace-nowrap">
                 <input type="checkbox" checked={unlimited} onChange={(e) => setUnlimited(e.target.checked)} />
                 Unlimited
               </label>
@@ -245,26 +244,26 @@ export default function ClientDetailPage() {
                 onChange={(e) => setProductLimit(e.target.value)}
                 className={`${inputClass} disabled:opacity-50`}
               />
-              <label className="flex items-center gap-2 text-sm text-slate-400 whitespace-nowrap">
+              <label className="flex items-center gap-2 text-sm text-ink-500 whitespace-nowrap">
                 <input type="checkbox" checked={productsUnlimited} onChange={(e) => setProductsUnlimited(e.target.checked)} />
                 Unlimited
               </label>
             </div>
           </div>
 
-          <label className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm text-ink-900">
             <input type="checkbox" checked={setupFeePaid} onChange={(e) => setSetupFeePaid(e.target.checked)} />
             One-time setup fee has been paid
           </label>
 
           {subscription === "suspended" && (
-            <p className="text-sm text-amber-500 bg-amber-500/10 border border-amber-500/20 rounded-lg px-3 py-2">
+            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
               Suspending blocks this business's chat widget immediately, even mid-conversation. Their admin login still works.
             </p>
           )}
 
-          {saveError && <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{saveError}</p>}
-          {saveMessage && <p className="text-sm text-green-500">{saveMessage}</p>}
+          {saveError && <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{saveError}</p>}
+          {saveMessage && <p className="text-sm text-green-600">{saveMessage}</p>}
 
           <button
             type="submit"
@@ -279,17 +278,17 @@ export default function ClientDetailPage() {
       <Section title="Admin logins">
         <div className="space-y-3">
           {client.admins.map((admin) => (
-            <div key={admin.id} className="flex items-center justify-between gap-4 rounded-lg border border-navy-700 px-3 py-2.5">
+            <div key={admin.id} className="flex items-center justify-between gap-4 rounded-lg border border-card-border px-3 py-2.5">
               <div>
-                <p className="text-sm">{admin.email}</p>
-                <p className="text-xs text-slate-500">
+                <p className="text-sm text-ink-900">{admin.email}</p>
+                <p className="text-xs text-ink-400">
                   {admin.role}
                   {admin.lastLoginAt && ` · last login ${new Date(admin.lastLoginAt).toLocaleDateString()}`}
                 </p>
               </div>
               <button
                 onClick={() => { setResetTargetId(admin.id); setResetMessage(null); }}
-                className="text-sm text-blue-400 hover:text-blue-300 transition"
+                className="text-sm text-blue-600 hover:text-blue-700 transition"
               >
                 Reset password
               </button>
@@ -298,7 +297,7 @@ export default function ClientDetailPage() {
         </div>
 
         {resetTargetId && (
-          <form onSubmit={handleResetPassword} className="mt-4 pt-4 border-t border-navy-700 flex items-center gap-3">
+          <form onSubmit={handleResetPassword} className="mt-4 pt-4 border-t border-card-border flex items-center gap-3">
             <input
               type="text"
               required
@@ -318,13 +317,13 @@ export default function ClientDetailPage() {
             <button
               type="button"
               onClick={() => setResetTargetId(null)}
-              className="text-sm text-slate-400 hover:text-ice-50 transition"
+              className="text-sm text-ink-500 hover:text-ink-900 transition"
             >
               Cancel
             </button>
           </form>
         )}
-        {resetMessage && <p className="text-sm text-green-500 mt-3">{resetMessage}</p>}
+        {resetMessage && <p className="text-sm text-green-600 mt-3">{resetMessage}</p>}
       </Section>
     </div>
   );

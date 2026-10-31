@@ -21,10 +21,10 @@ const PERIODS = [
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-800 p-4">
-      <p className="text-xs text-slate-500 mb-1">{label}</p>
-      <p className="font-mono text-xl font-medium text-ice-50">{value}</p>
-      {sub && <p className="text-xs text-slate-500 mt-1">{sub}</p>}
+    <div className="rounded-xl border border-card-border bg-card shadow-sm p-4">
+      <p className="text-xs text-ink-400 mb-1">{label}</p>
+      <p className="font-mono text-xl font-medium text-ink-900">{value}</p>
+      {sub && <p className="text-xs text-ink-400 mt-1">{sub}</p>}
     </div>
   );
 }
@@ -32,8 +32,8 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
 function RevenueChart({ byDay }: { byDay: AnalyticsSummary["revenue"]["byDay"] }) {
   if (byDay.length === 0) {
     return (
-      <div className="text-center py-12 border border-dashed border-navy-700 rounded-xl">
-        <p className="text-slate-400 text-sm">No revenue in this period yet.</p>
+      <div className="text-center py-12 border border-dashed border-card-border rounded-xl">
+        <p className="text-ink-500 text-sm">No revenue in this period yet.</p>
       </div>
     );
   }
@@ -41,7 +41,7 @@ function RevenueChart({ byDay }: { byDay: AnalyticsSummary["revenue"]["byDay"] }
   const max = Math.max(...byDay.map((d) => d.revenue), 1);
 
   return (
-    <div className="rounded-xl border border-navy-700 bg-navy-800 p-4">
+    <div className="rounded-xl border border-card-border bg-card shadow-sm p-4">
       <div className="flex items-end gap-1.5 h-40">
         {byDay.map((d) => {
           const heightPct = Math.max((d.revenue / max) * 100, d.revenue > 0 ? 4 : 0);
@@ -64,7 +64,7 @@ function RevenueChart({ byDay }: { byDay: AnalyticsSummary["revenue"]["byDay"] }
           );
         })}
       </div>
-      <div className="flex justify-between mt-2 text-[10px] text-slate-500">
+      <div className="flex justify-between mt-2 text-[10px] text-ink-400">
         <span>{formatShortDate(byDay[0].date)}</span>
         {byDay.length > 1 && <span>{formatShortDate(byDay[byDay.length - 1].date)}</span>}
       </div>
@@ -87,8 +87,8 @@ export default function AnalyticsPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold">Analytics</h1>
-      <p className="text-slate-400 text-sm mt-1 mb-6">How your store is doing, at a glance.</p>
+      <h1 className="font-display text-2xl font-semibold text-ink-900">Analytics</h1>
+      <p className="text-ink-500 text-sm mt-1 mb-6">How your store is doing, at a glance.</p>
 
       <div className="flex gap-2 mb-6">
         {PERIODS.map((p) => (
@@ -97,8 +97,8 @@ export default function AnalyticsPage() {
             onClick={() => setDays(p.days)}
             className={`text-sm px-3 py-1.5 rounded-lg border transition ${
               days === p.days
-                ? "bg-blue-500/15 text-blue-300 border-blue-500/30"
-                : "text-slate-400 border-navy-700 hover:text-ice-50 hover:bg-navy-800"
+                ? "bg-blue-50 text-blue-700 border-blue-200"
+                : "text-ink-500 border-card-border hover:text-ink-900 hover:bg-surface-50"
             }`}
           >
             {p.label}
@@ -107,7 +107,7 @@ export default function AnalyticsPage() {
       </div>
 
       {error && (
-        <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-6">
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-6">
           {error}
         </p>
       )}
@@ -143,7 +143,7 @@ export default function AnalyticsPage() {
           </div>
 
           <div>
-            <p className="text-sm text-slate-400 mb-2">Revenue by day</p>
+            <p className="text-sm text-ink-500 mb-2">Revenue by day</p>
             <RevenueChart byDay={summary.revenue.byDay} />
           </div>
         </div>

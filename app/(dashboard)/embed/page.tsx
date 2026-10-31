@@ -99,23 +99,23 @@ export default function EmbedPage() {
 
   return (
     <div>
-      <h1 className="font-display text-2xl font-semibold">Add AMARA to your website</h1>
-      <p className="text-slate-400 text-sm mt-1 mb-8">
+      <h1 className="font-display text-2xl font-semibold text-ink-900">Add AMARA to your website</h1>
+      <p className="text-ink-500 text-sm mt-1 mb-8">
         Paste one snippet into your site and a chat bubble appears - no coding required beyond that.
       </p>
 
       {error && (
-        <p className="text-sm text-red-500 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-6">
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2 mb-6">
           {error}
         </p>
       )}
 
       <form
         onSubmit={handleSaveWhatsapp}
-        className="rounded-xl border border-navy-700 bg-navy-800 p-4 mb-8"
+        className="rounded-xl border border-card-border bg-card shadow-sm p-4 mb-8"
       >
-        <p className="text-sm font-medium mb-1.5">Your WhatsApp number</p>
-        <p className="text-xs text-slate-500 mb-3">
+        <p className="text-sm font-medium text-ink-900 mb-1.5">Your WhatsApp number</p>
+        <p className="text-xs text-ink-400 mb-3">
           When a customer confirms an order, AMARA sends them a button that opens WhatsApp with the
           order details already filled in, addressed to this number. Include your country code (e.g.
           2348012345678).
@@ -125,7 +125,7 @@ export default function EmbedPage() {
             value={whatsappNumber}
             onChange={(e) => setWhatsappNumber(e.target.value)}
             placeholder="2348012345678"
-            className="flex-1 rounded-lg bg-navy-900 border border-navy-700 px-4 py-2.5 text-sm font-mono outline-none focus:border-blue-400"
+            className="flex-1 rounded-lg bg-surface-50 border border-card-border px-4 py-2.5 text-sm font-mono text-ink-900 outline-none focus:border-blue-400"
           />
           <button
             type="submit"
@@ -135,20 +135,20 @@ export default function EmbedPage() {
             {whatsappSaving ? "Saving…" : "Save"}
           </button>
         </div>
-        {whatsappSaved && <p className="text-sm text-green-500 mt-2">Saved</p>}
+        {whatsappSaved && <p className="text-sm text-green-600 mt-2">Saved</p>}
       </form>
 
       {apiKey && (
         <>
           {products.length > 0 && (
             <div className="mb-6">
-              <label className="block text-sm text-slate-400 mb-1.5">
-                Link this widget to one product? <span className="text-slate-500">(optional)</span>
+              <label className="block text-sm text-ink-500 mb-1.5">
+                Link this widget to one product? <span className="text-ink-400">(optional)</span>
               </label>
               <select
                 value={selectedProductId}
                 onChange={(e) => setSelectedProductId(e.target.value)}
-                className="w-full rounded-lg bg-navy-800 border border-navy-700 px-4 py-2.5 text-sm outline-none focus:border-blue-400"
+                className="w-full rounded-lg bg-surface-50 border border-card-border px-4 py-2.5 text-sm text-ink-900 outline-none focus:border-blue-400"
               >
                 <option value="">No specific product - AMARA asks the customer</option>
                 {products.map((p) => (
@@ -157,15 +157,15 @@ export default function EmbedPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-slate-500 mt-1.5">
+              <p className="text-xs text-ink-400 mt-1.5">
                 Use this on a product-specific landing page or ad link, so AMARA already knows what the
                 visitor is interested in.
               </p>
             </div>
           )}
 
-          <div className="rounded-xl border border-navy-700 bg-navy-800 p-4 mb-3">
-            <pre className="text-xs font-mono text-blue-300 whitespace-pre-wrap break-all">{snippet}</pre>
+          <div className="rounded-xl border border-card-border bg-card shadow-sm p-4 mb-3">
+            <pre className="text-xs font-mono text-blue-700 whitespace-pre-wrap break-all">{snippet}</pre>
           </div>
 
           <div className="flex items-center gap-3 mb-10">
@@ -175,20 +175,20 @@ export default function EmbedPage() {
             >
               {copied ? "Copied!" : "Copy snippet"}
             </button>
-            <p className="text-xs text-slate-500">Paste this just before the closing &lt;/body&gt; tag.</p>
+            <p className="text-xs text-ink-400">Paste this just before the closing &lt;/body&gt; tag.</p>
           </div>
 
-          <div className="rounded-xl border border-navy-700 bg-navy-800 p-4">
-            <p className="text-sm font-medium mb-1.5">Your API key</p>
-            <p className="font-mono text-sm text-slate-400 mb-3 break-all">{apiKey}</p>
+          <div className="rounded-xl border border-card-border bg-card shadow-sm p-4">
+            <p className="text-sm font-medium text-ink-900 mb-1.5">Your API key</p>
+            <p className="font-mono text-sm text-ink-500 mb-3 break-all">{apiKey}</p>
             <button
               onClick={handleRegenerate}
               disabled={regenerating}
-              className="text-sm text-red-500/80 hover:text-red-500 disabled:opacity-50 transition"
+              className="text-sm text-red-600/80 hover:text-red-600 disabled:opacity-50 transition"
             >
               {regenerating ? "Regenerating…" : "Regenerate key"}
             </button>
-            <p className="text-xs text-slate-500 mt-2">
+            <p className="text-xs text-ink-400 mt-2">
               Only do this if your key has been exposed somewhere public - it will break your live widget
               until you update the snippet above with the new key.
             </p>
