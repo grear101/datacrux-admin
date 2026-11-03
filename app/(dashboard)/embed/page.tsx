@@ -18,6 +18,7 @@ export default function EmbedPage() {
   const [selectedProductId, setSelectedProductId] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
   const [origin, setOrigin] = useState("");
 
@@ -89,10 +90,23 @@ export default function EmbedPage() {
         defer></script>`
     : "";
 
+  // A plain link, not a code snippet - the only thing social platforms,
+  // bios, and ad "destination URL" fields will actually accept. Opens
+  // AMARA directly, already knowing the product if one's selected above.
+  const adLink = apiKey
+    ? `${origin}/chat?key=${apiKey}${selectedProductId ? `&product=${selectedProductId}` : ""}`
+    : "";
+
   function handleCopy() {
     navigator.clipboard.writeText(snippet);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  function handleCopyLink() {
+    navigator.clipboard.writeText(adLink);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
   }
 
   if (apiKey === null && !error) return <NodeLoader label="Loading your integration…" />;
@@ -158,8 +172,8 @@ export default function EmbedPage() {
                 ))}
               </select>
               <p className="text-xs text-ink-400 mt-1.5">
-                Use this on a product-specific landing page or ad link, so AMARA already knows what the
-                visitor is interested in.
+                Applies to both the website snippet below and the social/ad link further down - so
+                AMARA already knows what the visitor is interested in, however they arrive.
               </p>
             </div>
           )}
@@ -178,6 +192,24 @@ export default function EmbedPage() {
             <p className="text-xs text-ink-400">Paste this just before the closing &lt;/body&gt; tag.</p>
           </div>
 
+          <div className="rounded-xl border border-card-border bg-card shadow-sm p-4 mb-10">
+            <p className="text-sm font-medium text-ink-900 mb-1.5">Social media &amp; ad link</p>
+            <p className="text-xs text-ink-400 mb-3">
+              Instagram bios, Facebook ad destination URLs, WhatsApp catalogs, TikTok bios, and similar
+              only accept a plain link, never a code snippet - this is that link. It opens AMARA directly,
+              already knowing the product above (if you picked one), with nothing else on the page.
+            </p>
+            <p className="font-mono text-xs break-all text-ink-700 bg-surface-50 border border-card-border rounded-lg px-3 py-2 mb-3">
+              {adLink}
+            </p>
+            <button
+              onClick={handleCopyLink}
+              className="rounded-lg bg-blue-500 hover:bg-blue-400 text-white text-sm font-medium px-4 py-2 transition"
+            >
+              {linkCopied ? "Copied!" : "Copy link"}
+            </button>
+          </div>
+
           <div className="rounded-xl border border-card-border bg-card shadow-sm p-4">
             <p className="text-sm font-medium text-ink-900 mb-1.5">Your API key</p>
             <p className="font-mono text-sm text-ink-500 mb-3 break-all">{apiKey}</p>
@@ -190,7 +222,7 @@ export default function EmbedPage() {
             </button>
             <p className="text-xs text-ink-400 mt-2">
               Only do this if your key has been exposed somewhere public - it will break your live widget
-              until you update the snippet above with the new key.
+              and ad link above until you update both with the new key.
             </p>
           </div>
         </>
