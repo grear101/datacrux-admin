@@ -147,6 +147,7 @@ export interface Order {
   customerName: string | null;
   customerPhone: string | null;
   deliveryAddress: string | null;
+  scheduledAt: string | null;
   subtotal: string;
   discountTotal: string;
   finalAmount: string;

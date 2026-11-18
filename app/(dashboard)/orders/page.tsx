@@ -18,6 +18,17 @@ function formatDate(iso: string) {
   });
 }
 
+function formatScheduled(iso: string) {
+  return new Date(iso).toLocaleString("en-NG", {
+    timeZone: "Africa/Lagos",
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 const STATUS_STYLES: Record<string, string> = {
   confirmed: "text-green-700 border-green-200 bg-green-50",
   pending: "text-amber-700 border-amber-200 bg-amber-50",
@@ -116,6 +127,11 @@ export default function OrdersPage() {
                     >
                       {order.status}
                     </span>
+                    {hasService && order.scheduledAt && (
+                      <span className="text-[11px] uppercase tracking-wide text-blue-700 border border-blue-200 bg-blue-50 rounded px-1.5 py-0.5">
+                        Booked
+                      </span>
+                    )}
                   </div>
                   {order.customerPhone && (
                     <p className="text-ink-500 text-sm font-mono mt-1">{order.customerPhone}</p>
@@ -135,9 +151,15 @@ export default function OrdersPage() {
                 ))}
               </div>
 
+              {hasService && order.scheduledAt && (
+                <p className="text-sm font-medium text-blue-700 mb-3">
+                  Scheduled: {formatScheduled(order.scheduledAt)}
+                </p>
+              )}
+
               {order.deliveryAddress && (
                 <p className="text-sm text-ink-500 mb-3">
-                  <span className="text-ink-400">{hasService ? "When/where: " : "Deliver to: "}</span>
+                  <span className="text-ink-400">{hasService ? "Location: " : "Deliver to: "}</span>
                   {order.deliveryAddress}
                 </p>
               )}
