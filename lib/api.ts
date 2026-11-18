@@ -81,6 +81,7 @@ export interface Product {
   minPrice: string;
   available: boolean;
   imageUrl: string | null;
+  imageUrls: string[];
   isService: boolean;
   createdAt: string;
 }
@@ -106,6 +107,7 @@ export function createProduct(data: {
   price: number;
   minPrice: number;
   imageUrl?: string;
+  imageUrls?: string[];
   isService?: boolean;
 }) {
   return request<Product>("/products", { method: "POST", body: JSON.stringify(data) });
@@ -120,6 +122,7 @@ export function updateProduct(id: string, data: Partial<{
   minPrice: number;
   available: boolean;
   imageUrl: string;
+  imageUrls: string[];
   isService: boolean;
 }>) {
   return request<Product>(`/products/${id}`, { method: "PATCH", body: JSON.stringify(data) });
@@ -157,8 +160,8 @@ export interface Order {
 }
 
 export interface OrderDateFilter {
-  startDate?: string; // YYYY-MM-DD
-  endDate?: string;   // YYYY-MM-DD
+  startDate?: string;
+  endDate?: string;
 }
 
 export function getOrders(filter: OrderDateFilter = {}) {
@@ -191,12 +194,8 @@ export interface AnalyticsSummary {
     total: number;
     byDay: { date: string; revenue: number; orderCount: number }[];
   };
-  orders: {
-    total: number;
-  };
-  conversations: {
-    total: number;
-  };
+  orders: { total: number };
+  conversations: { total: number };
   conversionRate: number;
   negotiation: {
     totalAttempts: number;
@@ -204,20 +203,18 @@ export interface AnalyticsSummary {
     approvalRate: number;
     avgDiscountPercent: number;
   };
-  handovers: {
-    total: number;
-    handoverRate: number;
-  };
+  handovers: { total: number; handoverRate: number };
 }
 
 export function getAnalyticsSummary(days: number = 30) {
   return request<AnalyticsSummary>(`/analytics/summary?days=${days}`);
 }
 
-// Uploads an image file to this admin panel's own /api/upload-product-image
-// route (which itself verifies the login token against the backend before
-// accepting anything), and returns a real hosted URL to save on a product.
-export async function uploadProductImage(file: File): Promise<string> {
+// Uploads a file to this admin panel's own /api/upload-product-image route
+// (which itself verifies the login token against the backend before
+// accepting anything), and returns a real hosted URL. Generic - used for
+// product photos, the gallery, and the storefront logo alike.
+export async function uploadImage(file: File): Promise<string> {
   const token = getToken();
   const formData = new FormData();
   formData.append("file", file);
@@ -269,7 +266,7 @@ export function regenerateApiKey() {
   return request<{ apiKey: string }>("/clients/api-key/regenerate", { method: "POST" });
 }
 
-// --- WhatsApp number (for order and handover notifications) ---
+// --- WhatsApp number ---
 export function getWhatsappNumber() {
   return request<{ whatsappNumber: string | null }>("/clients/whatsapp-number");
 }
@@ -385,4 +382,45 @@ export interface PlatformOverview {
 
 export function getPlatformOverview(days: number = 30) {
   return request<PlatformOverview>(`/platform/overview?days=${days}`);
+}
+
+// --- Storefront ---
+export interface StorefrontSettings {
+  eligible: boolean;
+  enabled: boolean;
+  slug: string | null;
+  tagline: string | null;
+  logoUrl: string | null;
+  accentColor: string | null;
+}
+
+export function getMyStorefront() {
+  return request<StorefrontSettings>("/storefront/me");
+}
+
+export function upsertStorefront(data: { slug: string; tagline?: string; logoUrl?: string; accentColor?: string }) {
+  return request<StorefrontSettings>("/storefront", { method: "POST", body: JSON.stringify(data) });
+}
+
+export function disableStorefront() {
+  return request<{ enabled: boolean }>("/storefront", { method: "DELETE" });
+}
+
+// --- Tracking & Marketing (per-platform ad/analytics pixels on the storefront) ---
+export interface TrackingPlatform {
+  key: string;
+  label: string;
+  placeholder: string;
+  trackingId: string;
+}
+
+export function getTrackingPlatforms() {
+  return request<TrackingPlatform[]>("/storefront/tracking");
+}
+
+export function saveTrackingPlatform(platform: string, trackingId: string) {
+  return request<TrackingPlatform[]>("/storefront/tracking", {
+    method: "PATCH",
+    body: JSON.stringify({ platform, trackingId }),
+  });
 }
