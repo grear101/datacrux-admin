@@ -9,7 +9,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
-  uploadProductImage,
+  uploadImage,
   ApiError,
 } from "@/lib/api";
 import { NodeLoader } from "@/components/NodeLoader";
@@ -22,6 +22,7 @@ type FormState = {
   price: string;
   minPrice: string;
   imageUrl: string;
+  imageUrls: string[];
   isService: boolean;
 };
 
@@ -33,6 +34,7 @@ const EMPTY_FORM: FormState = {
   price: "",
   minPrice: "",
   imageUrl: "",
+  imageUrls: [],
   isService: false,
 };
 
@@ -45,7 +47,9 @@ export default function ProductsPage() {
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   async function load() {
     try {
@@ -81,6 +85,7 @@ export default function ProductsPage() {
       price: p.price,
       minPrice: p.minPrice,
       imageUrl: p.imageUrl || "",
+      imageUrls: p.imageUrls || [],
       isService: p.isService,
     });
     setShowForm(true);
@@ -93,13 +98,33 @@ export default function ProductsPage() {
     setUploading(true);
     setError(null);
     try {
-      const url = await uploadProductImage(file);
+      const url = await uploadImage(file);
       setForm((f) => ({ ...f, imageUrl: url }));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Couldn't upload that image.");
     } finally {
       setUploading(false);
     }
+  }
+
+  async function handleGallerySelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingGallery(true);
+    setError(null);
+    try {
+      const url = await uploadImage(file);
+      setForm((f) => ({ ...f, imageUrls: [...f.imageUrls, url] }));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Couldn't upload that image.");
+    } finally {
+      setUploadingGallery(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = "";
+    }
+  }
+
+  function removeGalleryImage(url: string) {
+    setForm((f) => ({ ...f, imageUrls: f.imageUrls.filter((u) => u !== url) }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -115,6 +140,7 @@ export default function ProductsPage() {
         price: Number(form.price),
         minPrice: Number(form.minPrice),
         imageUrl: form.imageUrl || undefined,
+        imageUrls: form.imageUrls,
         isService: form.isService,
       };
       if (editingId) {
@@ -132,7 +158,7 @@ export default function ProductsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Remove this product? If it has past orders, it will just be hidden instead of deleted.")) {
+    if (!confirm("Remove this product? If it has past orders, it will just be hidden instead of deleted. If it's on your storefront, it disappears from there too.")) {
       return;
     }
     try {
@@ -184,7 +210,7 @@ export default function ProductsPage() {
           </h2>
 
           <div>
-            <label className="block text-xs text-ink-500 mb-1.5">Photo</label>
+            <label className="block text-xs text-ink-500 mb-1.5">Cover photo</label>
             <div className="flex items-center gap-4">
               {form.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -212,6 +238,44 @@ export default function ProductsPage() {
                 className="text-sm text-blue-600 hover:text-blue-700 border border-card-border rounded-lg px-3 py-1.5 disabled:opacity-50 transition"
               >
                 {uploading ? "Uploading…" : form.imageUrl ? "Change photo" : "Upload photo"}
+              </button>
+            </div>
+            <p className="text-xs text-ink-400 mt-1.5">Used in chat and as this product's main photo on your storefront.</p>
+          </div>
+
+          <div>
+            <label className="block text-xs text-ink-500 mb-1.5">
+              Additional photos <span className="text-ink-400">(optional - shown on your storefront's product view)</span>
+            </label>
+            <div className="flex flex-wrap items-center gap-3">
+              {form.imageUrls.map((url) => (
+                <div key={url} className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt="" className="w-14 h-14 rounded-lg object-cover border border-card-border" />
+                  <button
+                    type="button"
+                    onClick={() => removeGalleryImage(url)}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center"
+                    aria-label="Remove photo"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+              <input
+                ref={galleryInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleGallerySelect}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => galleryInputRef.current?.click()}
+                disabled={uploadingGallery}
+                className="w-14 h-14 rounded-lg border border-dashed border-card-border flex items-center justify-center text-ink-400 text-xl disabled:opacity-50"
+              >
+                {uploadingGallery ? "…" : "+"}
               </button>
             </div>
           </div>
@@ -287,7 +351,7 @@ export default function ProductsPage() {
           <div className="flex gap-3 pt-1">
             <button
               type="submit"
-              disabled={saving || uploading}
+              disabled={saving || uploading || uploadingGallery}
               className="rounded-lg bg-blue-500 hover:bg-blue-400 disabled:opacity-60 text-white text-sm font-medium px-4 py-2 transition"
             >
               {saving ? "Saving…" : editingId ? "Save changes" : "Create product"}
