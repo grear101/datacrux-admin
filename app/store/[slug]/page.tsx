@@ -80,8 +80,10 @@ export default function StorefrontPage() {
   }, [data]);
 
   function orderLink(productId: string) {
-    const dashboardHost =
-      typeof window !== "undefined" ? window.location.hostname.replace(/^store\./, "") : "";
+    // Explicit, not guessed - stripping "store." off the current host
+    // would land on the marketing site's domain, not the dashboard's,
+    // since they're separate projects under the same root domain.
+    const dashboardHost = process.env.NEXT_PUBLIC_DASHBOARD_HOST;
     return `https://${dashboardHost}/chat?key=${data?.apiKey}&product=${productId}`;
   }
 
