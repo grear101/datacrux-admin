@@ -88,70 +88,201 @@ export default function StorefrontPage() {
   }
 
   if (notFound) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "sans-serif", color: "#6b7280" }}>
-        This storefront isn&apos;t available.
-      </div>
-    );
+    return <div className="sf-empty-state">This storefront isn&apos;t available.</div>;
   }
 
   if (!data) {
-    return <div style={{ minHeight: "100vh", background: "#fafafa" }} />;
+    return <div className="sf-loading" />;
   }
 
   const accent = data.accentColor || "#2F6FED";
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fafafa", fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
-      <header style={{ padding: "40px 20px 28px", textAlign: "center", background: "#ffffff", borderBottom: "1px solid #eee" }}>
+    <div className="sf-page" style={{ ["--accent" as any]: accent }}>
+      <style>{`
+        .sf-empty-state, .sf-loading {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          color: #6b7280;
+          background: #fafafa;
+          padding: 24px;
+          text-align: center;
+        }
+        .sf-page {
+          min-height: 100vh;
+          background: linear-gradient(180deg, #fafafa 0%, #f3f4f6 420px);
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .sf-header {
+          padding: clamp(28px, 6vw, 48px) 20px clamp(24px, 5vw, 32px);
+          text-align: center;
+          background: #ffffff;
+          border-bottom: 3px solid var(--accent);
+          position: relative;
+        }
+        .sf-logo {
+          width: clamp(56px, 12vw, 72px);
+          height: clamp(56px, 12vw, 72px);
+          border-radius: 50%;
+          object-fit: cover;
+          margin: 0 auto 14px;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+          border: 2px solid #fff;
+        }
+        .sf-name {
+          font-size: clamp(20px, 5vw, 28px);
+          font-weight: 800;
+          color: #111827;
+          margin: 0;
+          letter-spacing: -0.02em;
+        }
+        .sf-tagline {
+          color: #6b7280;
+          font-size: clamp(13px, 3vw, 15px);
+          margin-top: 6px;
+        }
+        .sf-main {
+          max-width: 1080px;
+          margin: 0 auto;
+          padding: clamp(20px, 4vw, 32px) 14px 60px;
+        }
+        .sf-empty {
+          text-align: center;
+          color: #9ca3af;
+          padding: 60px 0;
+        }
+        .sf-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 12px;
+        }
+        @media (min-width: 560px) {
+          .sf-grid { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+        }
+        @media (min-width: 860px) {
+          .sf-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        .sf-card {
+          background: #fff;
+          border-radius: 14px;
+          border: 1px solid #eee;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        .sf-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+        }
+        .sf-card-image {
+          aspect-ratio: 1 / 1;
+          background: #f3f4f6;
+          position: relative;
+          overflow: hidden;
+        }
+        .sf-card-image img {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center;
+        }
+        .sf-badge {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          background: var(--accent);
+          color: #fff;
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          padding: 3px 7px;
+          border-radius: 999px;
+        }
+        .sf-card-body {
+          padding: clamp(10px, 2.4vw, 16px);
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+        }
+        .sf-card-name {
+          font-weight: 700;
+          font-size: clamp(13px, 3vw, 15px);
+          color: #111827;
+          margin: 0 0 4px;
+          line-height: 1.3;
+        }
+        .sf-card-desc {
+          font-size: clamp(11.5px, 2.6vw, 13px);
+          color: #6b7280;
+          margin: 0 0 10px;
+          flex: 1;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+        .sf-card-price {
+          font-weight: 800;
+          font-size: clamp(14px, 3.2vw, 17px);
+          color: #111827;
+          margin: 0 0 10px;
+        }
+        .sf-order-btn {
+          display: block;
+          text-align: center;
+          background: var(--accent);
+          color: #fff;
+          font-weight: 700;
+          font-size: clamp(12px, 2.8vw, 14px);
+          padding: clamp(8px, 2vw, 11px) 0;
+          border-radius: 9px;
+          text-decoration: none;
+          transition: filter 0.15s ease;
+        }
+        .sf-order-btn:hover { filter: brightness(1.1); }
+        .sf-footer {
+          text-align: center;
+          padding: 24px 0 44px;
+          color: #9ca3af;
+          font-size: 12px;
+        }
+      `}</style>
+
+      <header className="sf-header">
         {data.logoUrl && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={data.logoUrl}
-            alt=""
-            style={{ width: 64, height: 64, borderRadius: "50%", objectFit: "cover", margin: "0 auto 14px" }}
-          />
+          <img src={data.logoUrl} alt="" className="sf-logo" />
         )}
-        <h1 style={{ fontSize: 24, fontWeight: 700, color: "#111827", margin: 0 }}>{data.businessName}</h1>
-        {data.tagline && <p style={{ color: "#6b7280", fontSize: 14, marginTop: 6 }}>{data.tagline}</p>}
+        <h1 className="sf-name">{data.businessName}</h1>
+        {data.tagline && <p className="sf-tagline">{data.tagline}</p>}
       </header>
 
-      <main style={{ maxWidth: 1000, margin: "0 auto", padding: "28px 16px 60px" }}>
+      <main className="sf-main">
         {data.products.length === 0 ? (
-          <p style={{ textAlign: "center", color: "#9ca3af", padding: "60px 0" }}>No products available right now.</p>
+          <p className="sf-empty">No products available right now.</p>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 18 }}>
+          <div className="sf-grid">
             {data.products.map((p) => (
-              <div
-                key={p.id}
-                style={{ background: "#fff", borderRadius: 12, border: "1px solid #eee", overflow: "hidden", display: "flex", flexDirection: "column" }}
-              >
-                <div style={{ aspectRatio: "1 / 1", background: "#f3f4f6" }}>
+              <div key={p.id} className="sf-card">
+                <div className="sf-card-image">
+                  {p.isService && <span className="sf-badge">Service</span>}
                   {p.imageUrl && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.imageUrl} alt={p.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <img src={p.imageUrl} alt={p.name} />
                   )}
                 </div>
-                <div style={{ padding: 14, display: "flex", flexDirection: "column", flex: 1 }}>
-                  <p style={{ fontWeight: 600, fontSize: 15, color: "#111827", margin: "0 0 4px" }}>{p.name}</p>
-                  {p.description && (
-                    <p style={{ fontSize: 13, color: "#6b7280", margin: "0 0 10px", flex: 1 }}>{p.description}</p>
-                  )}
-                  <p style={{ fontWeight: 700, fontSize: 16, color: "#111827", margin: "0 0 12px" }}>{formatNaira(p.price)}</p>
-                  <a
-                    href={orderLink(p.id)}
-                    style={{
-                      display: "block",
-                      textAlign: "center",
-                      background: accent,
-                      color: "#fff",
-                      fontWeight: 600,
-                      fontSize: 14,
-                      padding: "10px 0",
-                      borderRadius: 8,
-                      textDecoration: "none",
-                    }}
-                  >
+                <div className="sf-card-body">
+                  <p className="sf-card-name">{p.name}</p>
+                  {p.description && <p className="sf-card-desc">{p.description}</p>}
+                  <p className="sf-card-price">{formatNaira(p.price)}</p>
+                  <a href={orderLink(p.id)} className="sf-order-btn">
                     Order Now
                   </a>
                 </div>
@@ -161,9 +292,7 @@ export default function StorefrontPage() {
         )}
       </main>
 
-      <footer style={{ textAlign: "center", padding: "20px 0 40px", color: "#9ca3af", fontSize: 12 }}>
-        Powered by Datacrux Africa Ltd
-      </footer>
+      <footer className="sf-footer">Powered by Datacrux Africa Ltd</footer>
     </div>
   );
 }
